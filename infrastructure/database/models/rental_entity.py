@@ -13,7 +13,7 @@ class RentalEntity(Base):
     start_date = Column(DateTime(timezone=False), nullable=False, server_default=func.now())
     end_date = Column(DateTime(timezone=False), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    rental_status_id = Column(BigInteger, ForeignKey("rental_status.id"), nullable=False)
+    rental_status_id = Column(BigInteger, ForeignKey("rental_statuses.id"), nullable=False)
 
     violations = relationship("ViolationEntity", back_populates="rental", cascade="all, delete-orphan")
     rental_status = relationship("RentalStatusEntity", back_populates="rentals")
