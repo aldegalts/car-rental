@@ -13,4 +13,4 @@ class UserEntity(Base):
     role_id = Column(BigInteger, ForeignKey("roles.id"), nullable=False)
 
     role = relationship("RoleEntity", back_populates="users")
-    client = relationship("ClientEntity", back_populates="users", cascade="all, delete-orphan")
+    client = relationship("ClientEntity", back_populates="user", uselist=False, cascade="all, delete-orphan")
