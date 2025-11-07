@@ -1,0 +1,40 @@
+from datetime import timedelta
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from application.auth.schemas import UserLogin
+from application.auth.utils.security import verify_password
+from application.auth.utils.jwt import create_access_token, create_refresh_token
+
+from application.auth.schemas.token_schema import TokenPairResponse
+import os
+
+from infrastructure.database.repository import UserRepository
+
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
+
+
+class LoginUserUseCase:
+    def __init__(self, db: Session):
+        self.db = db
+        self.user_repository = UserRepository(db)
+
+    def login_user(self, login_data: UserLogin) -> TokenPairResponse:
+        user = self.user_repository.get_by_username(login_data.username)
+        if not user or not verify_password(login_data.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password",
+            )
+
+        access_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        payload = {"sub": str(user.id), "role": user.role.role_name}
+
+        access_token = create_access_token(payload, access_expires)
+        refresh_token = create_refresh_token(payload)
+
+        return TokenPairResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+        )
