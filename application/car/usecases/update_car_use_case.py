@@ -16,6 +16,7 @@ class UpdateCarUseCase:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
 
         car_res = self.car_repo.update(
+            car_id=car.id,
             brand=car_data.brand,
             model=car_data.model,
             year=car_data.year,

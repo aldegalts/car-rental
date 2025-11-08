@@ -35,11 +35,11 @@ class CarRepository:
         return self.session.get(CarEntity, car_id)
 
     def update(
-            self, brand: str, model: str,
+            self, car_id: int, brand: str, model: str,
             year: int, category_id: int, license_plate: str,
             color_id: int, daily_cost: Decimal, car_status_id: int
     ) -> CarEntity:
-        car_obj = self.session.get(CarEntity, category_id)
+        car_obj = self.session.get(CarEntity, car_id)
         car_obj.brand = brand
         car_obj.model = model
         car_obj.year = year
