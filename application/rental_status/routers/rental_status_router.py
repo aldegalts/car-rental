@@ -44,7 +44,7 @@ def get_all_statuses(db: Session = Depends(get_db)):
 
 
 @router.put("/{status_id}", response_model=RentalStatusRead)
-def add_status(
+def update_status(
     status_data: RentalStatusUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)

@@ -43,7 +43,7 @@ def get_all_categories(db: Session = Depends(get_db)):
 
 
 @router.put("/{category_id}", response_model=CarCategoryRead)
-def add_category(
+def update_category(
     category_data: CarCategoryUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
