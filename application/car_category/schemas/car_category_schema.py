@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class CarCategoryBase(BaseModel):
-    category_name: str = Field(..., examples=["Economy"])
-    description: str = Field(..., examples=["Budget-friendly small cars"])
-    base_cost: Decimal = Field(..., examples=["45.00"])
+    category_name: str = Field(..., examples=["Эконом"])
+    description: str = Field(..., examples=["Компактные и экономичные машины"])
+    base_cost: Decimal = Field(..., examples=["1500.00"])
 
 
 class CarCategoryCreate(CarCategoryBase):

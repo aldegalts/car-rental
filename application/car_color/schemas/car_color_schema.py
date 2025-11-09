@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class CarColorBase(BaseModel):
-    color: str = Field(..., examples=["Red"])
+    color: str = Field(..., examples=["Красный"])
     hex: str = Field(..., examples=["#FF0000"])
 
 
