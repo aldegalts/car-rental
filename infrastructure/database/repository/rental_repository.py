@@ -1,6 +1,63 @@
+from datetime import datetime
+from decimal import Decimal
+from typing import Optional, List
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
+
+from infrastructure.database.models import RentalEntity
 
 
 class RentalRepository:
     def __init__(self, session: Session):
         self.session = session
+
+    def create(
+            self, client_id: int, car_id: int,
+            start_date: datetime, end_date: datetime,
+            total_amount: Decimal, rental_status_id: int
+    ) -> RentalEntity:
+        rental_obj = RentalEntity(
+            client_id=client_id,
+            car_id=car_id,
+            start_date=start_date,
+            end_date=end_date,
+            total_amount=total_amount,
+            rental_status_id=rental_status_id
+        )
+        self.session.add(rental_obj)
+        self.session.commit()
+        self.session.refresh(rental_obj)
+        return rental_obj
+
+    def get_by_id(self, rental_id: int) -> Optional[RentalEntity]:
+        return self.session.get(RentalEntity, rental_id)
+
+    def update(
+            self, rental_id: int, car_id: int,
+            start_date: datetime, end_date: datetime,
+            total_amount: Decimal, rental_status_id: int
+    ) -> RentalEntity:
+        rental_obj = self.session.get(RentalEntity, rental_id)
+        rental_obj.car_id = car_id
+        rental_obj.start_date = start_date
+        rental_obj.end_date = end_date
+        rental_obj.total_amount = total_amount
+        rental_obj.rental_status_id = rental_status_id
+        self.session.commit()
+        self.session.refresh(rental_obj)
+        return rental_obj
+
+    def delete(self, rental_id: int):
+        rental = self.session.query(RentalEntity).filter(RentalEntity.id == rental_id).first()
+        if rental:
+            self.session.delete(rental)
+            self.session.commit()
+
+    def get_all(self) -> List[RentalEntity]:
+        return list(
+            self.session.scalars(
+                select(RentalEntity)
+            )
+            .all()
+        )
