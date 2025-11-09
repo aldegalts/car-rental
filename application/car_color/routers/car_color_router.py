@@ -43,7 +43,7 @@ def get_all_colors(db: Session = Depends(get_db)):
 
 
 @router.put("/{color_id}", response_model=CarColorRead)
-def add_color(
+def update_color(
     color_data: CarColorUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)

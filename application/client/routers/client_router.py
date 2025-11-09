@@ -21,7 +21,7 @@ def add_client(
 
 
 @router.put("/{client_id}", response_model=ClientRead)
-def add_car(
+def update_client(
     client_data: ClientUpdate,
     db: Session = Depends(get_db)
 ):

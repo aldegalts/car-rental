@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class RentalStatusBase(BaseModel):
-    status: str = Field(..., examples=["Completed"])
+    status: str = Field(..., examples=["Активна"])
 
 
 class RentalStatusCreate(RentalStatusBase):
