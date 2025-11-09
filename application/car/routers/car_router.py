@@ -42,7 +42,7 @@ def get_all_cars(db: Session = Depends(get_db)):
 
 
 @router.put("/{car_id}", response_model=CarRead)
-def add_car(
+def update_car(
     car_data: CarUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
