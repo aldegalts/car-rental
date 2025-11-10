@@ -6,6 +6,7 @@ from application.car_color.routers import car_color_router
 from application.car_status.routers import car_status_router
 from application.rental.routers import rental_router
 from application.rental_status.routers import rental_status_router
+from application.violation.routers import violation_router
 from application.violation_type.routers import violation_type_router
 
 app = FastAPI(title="Car rental")
@@ -18,6 +19,7 @@ app.include_router(car_router.router)
 app.include_router(rental_status_router.router)
 app.include_router(rental_router.router)
 app.include_router(violation_type_router.router)
+app.include_router(violation_router.router)
 
 
 
