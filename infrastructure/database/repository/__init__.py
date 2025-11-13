@@ -9,3 +9,4 @@ from .car_repository import CarRepository
 from .rental_repository import RentalRepository
 from .violation_type_repository import ViolationTypeRepository
 from .violation_repository import ViolationRepository
+from .refresh_token_repository import RefreshTokenRepository

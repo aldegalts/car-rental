@@ -9,7 +9,8 @@ from application.auth.utils.jwt import create_access_token, create_refresh_token
 from application.auth.schemas.token_schema import TokenPairResponse
 import os
 
-from infrastructure.database.repository import UserRepository
+from infrastructure.database.models import RefreshTokenEntity
+from infrastructure.database.repository import UserRepository, RefreshTokenRepository
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
@@ -18,6 +19,7 @@ class LoginUserUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.refresh_token_repo = RefreshTokenRepository(db)
 
     def login_user(self, login_data: UserLogin) -> TokenPairResponse:
         user = self.user_repository.get_by_username(login_data.username)
@@ -31,10 +33,18 @@ class LoginUserUseCase:
         payload = {"sub": str(user.id), "role": user.role.role_name}
 
         access_token = create_access_token(payload, access_expires)
-        refresh_token = create_refresh_token(payload)
+        refresh_token_value, expires_at = create_refresh_token(payload)
+
+        refresh_token_entity = RefreshTokenEntity(
+            user_id=user.id,
+            token=refresh_token_value,
+            expires_at=expires_at
+        )
+
+        self.refresh_token_repo.add(refresh_token_entity)
 
         return TokenPairResponse(
             access_token=access_token,
-            refresh_token=refresh_token,
+            refresh_token=refresh_token_value,
             token_type="bearer",
         )

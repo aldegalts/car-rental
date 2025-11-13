@@ -10,3 +10,4 @@ from .car_entity import CarEntity
 from .rental_entity import RentalEntity
 from .violation_type_entity import ViolationTypeEntity
 from .violation_entity import ViolationEntity
+from .refresh_token_entity import RefreshTokenEntity
