@@ -4,11 +4,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from application.car.schemas import CarRead, CarCreate, CarUpdate
-from application.car.usecases import CreateCarUseCase, DeleteCarUseCase, GetAllCarUseCase, UpdateCarUseCase
+from application.car.usecases import CreateCarUseCase, DeleteCarUseCase, GetAllCarUseCase, UpdateCarUseCase, \
+    GetCarUseCase
 from application.dependencies import get_current_user
 from infrastructure.database.database_session import get_db
 
 router = APIRouter(prefix="/cars", tags=["Cars"])
+
+
+@router.get("/", response_model=List[CarRead])
+def get_all_cars(db: Session = Depends(get_db)):
+    return GetAllCarUseCase(db).execute()
+
+
+@router.get("/{id}", response_model=CarRead)
+def get_car_by_id(car_id: int, db: Session = Depends(get_db)):
+    return GetCarUseCase(db).execute(car_id)
 
 
 @router.post("/", response_model=CarRead, status_code=status.HTTP_201_CREATED)
@@ -34,11 +45,6 @@ def delete_car(
 
     DeleteCarUseCase(db).execute(car_id)
     return {"detail": "Car deleted successfully"}
-
-
-@router.get("/", response_model=List[CarRead])
-def get_all_cars(db: Session = Depends(get_db)):
-    return GetAllCarUseCase(db).execute()
 
 
 @router.put("/{car_id}", response_model=CarRead)
