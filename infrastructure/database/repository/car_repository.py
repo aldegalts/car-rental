@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Optional, List
 
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
 from infrastructure.database.models import CarEntity
@@ -10,6 +10,53 @@ from infrastructure.database.models import CarEntity
 class CarRepository:
     def __init__(self, session: Session):
         self.session = session
+
+    def get_by_id(self, car_id: int) -> Optional[CarEntity]:
+        return self.session.get(CarEntity, car_id)
+
+    def get_all(self) -> List[CarEntity]:
+        return list(
+            self.session.scalars(
+                select(CarEntity)
+            )
+            .all()
+        )
+
+    def filter(
+            self,
+            brand: Optional[str] = None,
+            model: Optional[str] = None,
+            category_id: Optional[int] = None,
+            color_id: Optional[int] = None,
+            min_year: Optional[int] = None,
+            max_year: Optional[int] = None,
+            min_cost: Optional[Decimal] = None,
+            max_cost: Optional[Decimal] = None
+    ) -> List[CarEntity]:
+        query = select(CarEntity)
+
+        filters = []
+        if brand:
+            filters.append(CarEntity.brand.ilike(f"%{brand}%"))
+        if model:
+            filters.append(CarEntity.model.ilike(f"%{model}%"))
+        if category_id:
+            filters.append(CarEntity.category_id == category_id)
+        if color_id:
+            filters.append(CarEntity.color_id == color_id)
+        if min_year:
+            filters.append(CarEntity.year >= min_year)
+        if max_year:
+            filters.append(CarEntity.year <= max_year)
+        if min_cost:
+            filters.append(CarEntity.daily_cost >= min_cost)
+        if max_cost:
+            filters.append(CarEntity.daily_cost <= max_cost)
+
+        if filters:
+            query = query.where(and_(*filters))
+
+        return list(self.session.scalars(query).all())
 
     def create(
             self, brand: str, model: str,
@@ -30,9 +77,6 @@ class CarRepository:
         self.session.commit()
         self.session.refresh(car_obj)
         return car_obj
-
-    def get_by_id(self, car_id: int) -> Optional[CarEntity]:
-        return self.session.get(CarEntity, car_id)
 
     def update(
             self, car_id: int, brand: str, model: str,
@@ -57,11 +101,3 @@ class CarRepository:
         if car:
             self.session.delete(car)
             self.session.commit()
-
-    def get_all(self) -> List[CarEntity]:
-        return list(
-            self.session.scalars(
-                select(CarEntity)
-            )
-            .all()
-        )

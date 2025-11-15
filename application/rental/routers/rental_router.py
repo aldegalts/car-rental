@@ -24,7 +24,7 @@ def add_rental(
 def delete_rental(
     rental_id: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user = Depends(get_current_user)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete rentals")

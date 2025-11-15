@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -28,3 +29,14 @@ class CarRead(CarBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CarFilter(BaseModel):
+    brand: Optional[str] = Field(None, description="Марка машины")
+    model: Optional[str] = Field(None, description="Модель машины")
+    category_id: Optional[int] = Field(None, description="ID категории")
+    color_id: Optional[int] = Field(None, description="ID цвета")
+    min_year: Optional[int] = Field(None, description="Минимальный год выпуска")
+    max_year: Optional[int] = Field(None, description="Максимальный год выпуска")
+    min_cost: Optional[Decimal] = Field(None, description="Минимальная стоимость аренды")
+    max_cost: Optional[Decimal] = Field(None, description="Максимальная стоимость аренды")

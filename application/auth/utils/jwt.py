@@ -24,7 +24,7 @@ def create_refresh_token(data: dict):
     to_encode = data.copy()
     to_encode.update({"exp": expire, "type": "refresh"})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
+    return encoded_jwt, expire
 
 
 def decode_token(token: str):
