@@ -15,8 +15,12 @@ router = APIRouter(prefix="/rentals", tags=["Rentals"])
 @router.post("/", response_model=RentalRead, status_code=status.HTTP_201_CREATED)
 def add_rental(
     rental_data: RentalCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user can rental cars")
+
     return CreateRentalUseCase(db).execute(rental_data)
 
 
