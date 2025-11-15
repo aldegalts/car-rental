@@ -37,6 +37,7 @@ class RegisterUserUseCase:
                 role_id=user_role.id
             )
         )
+
         return UserResponse(
             id=created_user.id,
             username=created_user.username,

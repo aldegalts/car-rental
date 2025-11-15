@@ -1,7 +1,6 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from application.dependencies import get_current_user
@@ -16,12 +15,8 @@ router = APIRouter(prefix="/rentals", tags=["Rentals"])
 @router.post("/", response_model=RentalRead, status_code=status.HTTP_201_CREATED)
 def add_rental(
     rental_data: RentalCreate,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
-    if not current_user:
-        return RedirectResponse(url="/auth/login", status_code=status.HTTP_303_SEE_OTHER)
-
     return CreateRentalUseCase(db).execute(rental_data)
 
 
