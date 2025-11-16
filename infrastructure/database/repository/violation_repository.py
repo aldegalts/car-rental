@@ -12,6 +12,26 @@ class ViolationRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_id(self, violation_id: int) -> Optional[ViolationEntity]:
+        return self.session.get(ViolationEntity, violation_id)
+
+    def get_by_user_id(self, user_id: int) -> List[ViolationEntity]:
+        return (
+            self.session.query(ViolationEntity)
+            .filter(ViolationEntity.rental.client.user_id == user_id)
+            .all()
+        )
+
+    def get_by_user_and_id(self, user_id: int, violation_id: int):
+        return (
+            self.session.query(ViolationEntity)
+            .filter(
+                ViolationEntity.id == violation_id,
+                ViolationEntity.rental.client.user_id == user_id
+            )
+            .first()
+        )
+
     def create(
             self, rental_id: int, violation_type_id: int,
             description: str, fine_amount: Decimal,
@@ -30,8 +50,11 @@ class ViolationRepository:
         self.session.refresh(violation_obj)
         return violation_obj
 
-    def get_by_id(self, violation_id: int) -> Optional[ViolationEntity]:
-        return self.session.get(ViolationEntity, violation_id)
+    def delete(self, violation_id: int):
+        violation = self.session.query(ViolationEntity).filter(ViolationEntity.id == violation_id).first()
+        if violation:
+            self.session.delete(violation)
+            self.session.commit()
 
     def update(
             self, violation_id: int, rental_id: int,
@@ -49,26 +72,3 @@ class ViolationRepository:
         self.session.commit()
         self.session.refresh(violation_obj)
         return violation_obj
-
-    def delete(self, violation_id: int):
-        violation = self.session.query(ViolationEntity).filter(ViolationEntity.id == violation_id).first()
-        if violation:
-            self.session.delete(violation)
-            self.session.commit()
-
-    def get_by_user_id(self, user_id: int) -> List[ViolationEntity]:
-        return (
-            self.session.query(ViolationEntity)
-            .filter(ViolationEntity.rental.client.user_id == user_id)
-            .all()
-        )
-
-    def get_by_user_and_id(self, user_id: int, violation_id: int):
-        return (
-            self.session.query(ViolationEntity)
-            .filter(
-                ViolationEntity.id == violation_id,
-                ViolationEntity.rental.client.user_id == user_id
-            )
-            .first()
-        )

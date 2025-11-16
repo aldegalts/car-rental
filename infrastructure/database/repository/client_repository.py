@@ -11,6 +11,17 @@ class ClientRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_id(self, client_id: int) -> Optional[ClientEntity]:
+        return self.session.get(ClientEntity, client_id)
+
+    def get_all(self) -> List[ClientEntity]:
+        return list(
+            self.session.scalars(
+                select(ClientEntity)
+            )
+            .all()
+        )
+
     def create(
             self, name: str, surname: str,
             birth_date: date, phone: str, email: str,
@@ -30,17 +41,6 @@ class ClientRepository:
         self.session.commit()
         self.session.refresh(client_obj)
         return client_obj
-
-    def get_by_id(self, client_id: int) -> Optional[ClientEntity]:
-        return self.session.get(ClientEntity, client_id)
-
-    def get_all(self) -> List[ClientEntity]:
-        return list(
-            self.session.scalars(
-                select(ClientEntity)
-            )
-            .all()
-        )
 
     def update(
             self, client_id: int, name: str, surname: str, phone: str, email: str, driver_license: str

@@ -12,6 +12,34 @@ class RentalRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_id(self, rental_id: int) -> Optional[RentalEntity]:
+        return self.session.get(RentalEntity, rental_id)
+
+    def get_by_user_id(self, user_id: int) -> List[RentalEntity]:
+        return (
+            self.session.query(RentalEntity)
+            .filter(RentalEntity.client.user_id == user_id)
+            .all()
+        )
+
+    def get_by_user_and_id(self, user_id: int, rental_id: int):
+        return (
+            self.session.query(RentalEntity)
+            .filter(
+                RentalEntity.id == rental_id,
+                RentalEntity.user_id == user_id
+            )
+            .first()
+        )
+
+    def get_all(self) -> List[RentalEntity]:
+        return list(
+            self.session.scalars(
+                select(RentalEntity)
+            )
+            .all()
+        )
+
     def create(
             self, client_id: int, car_id: int,
             start_date: datetime, end_date: datetime,
@@ -30,8 +58,11 @@ class RentalRepository:
         self.session.refresh(rental_obj)
         return rental_obj
 
-    def get_by_id(self, rental_id: int) -> Optional[RentalEntity]:
-        return self.session.get(RentalEntity, rental_id)
+    def delete(self, rental_id: int):
+        rental = self.session.query(RentalEntity).filter(RentalEntity.id == rental_id).first()
+        if rental:
+            self.session.delete(rental)
+            self.session.commit()
 
     def update(
             self, rental_id: int, car_id: int,
@@ -47,37 +78,6 @@ class RentalRepository:
         self.session.commit()
         self.session.refresh(rental_obj)
         return rental_obj
-
-    def delete(self, rental_id: int):
-        rental = self.session.query(RentalEntity).filter(RentalEntity.id == rental_id).first()
-        if rental:
-            self.session.delete(rental)
-            self.session.commit()
-
-    def get_all(self) -> List[RentalEntity]:
-        return list(
-            self.session.scalars(
-                select(RentalEntity)
-            )
-            .all()
-        )
-
-    def get_by_user_id(self, user_id: int) -> List[RentalEntity]:
-        return (
-            self.session.query(RentalEntity)
-            .filter(RentalEntity.client.user_id == user_id)
-            .all()
-        )
-
-    def get_by_user_and_id(self, user_id: int, rental_id: int):
-        return (
-            self.session.query(RentalEntity)
-            .filter(
-                RentalEntity.id == rental_id,
-                RentalEntity.user_id == user_id
-            )
-            .first()
-        )
 
     def filter(
             self,

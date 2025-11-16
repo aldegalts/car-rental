@@ -10,6 +10,17 @@ class CarStatusRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_id(self, status_id: int) -> Optional[CarStatusEntity]:
+        return self.session.get(CarStatusEntity, status_id)
+
+    def get_all(self) -> List[CarStatusEntity]:
+        return list(
+            self.session.scalars(
+                select(CarStatusEntity)
+            )
+            .all()
+        )
+
     def create(self, status: str) -> CarStatusEntity:
         status_obj = CarStatusEntity(status=status)
         self.session.add(status_obj)
@@ -22,17 +33,6 @@ class CarStatusRepository:
         if status:
             self.session.delete(status)
             self.session.commit()
-
-    def get_by_id(self, status_id: int) -> Optional[CarStatusEntity]:
-        return self.session.get(CarStatusEntity, status_id)
-
-    def get_all(self) -> List[CarStatusEntity]:
-        return list(
-            self.session.scalars(
-                select(CarStatusEntity)
-            )
-            .all()
-        )
 
     def update(self, status_id: int, status: str) -> CarStatusEntity:
         status_obj = self.session.get(CarStatusEntity, status_id)

@@ -11,6 +11,18 @@ class ViolationTypeRepository:
     def __init__(self, session: Session):
         self.session = session
 
+
+    def get_by_id(self, type_id: int) -> Optional[ViolationTypeEntity]:
+        return self.session.get(ViolationTypeEntity, type_id)
+
+    def get_all(self) -> List[ViolationTypeEntity]:
+        return list(
+            self.session.scalars(
+                select(ViolationTypeEntity)
+            )
+            .all()
+        )
+
     def create(self, type_name: str, default_fine: Decimal, description: str) -> ViolationTypeEntity:
         v_type_obj = ViolationTypeEntity(
             type_name=type_name,
@@ -27,17 +39,6 @@ class ViolationTypeRepository:
         if v_type:
             self.session.delete(v_type)
             self.session.commit()
-
-    def get_by_id(self, type_id: int) -> Optional[ViolationTypeEntity]:
-        return self.session.get(ViolationTypeEntity, type_id)
-
-    def get_all(self) -> List[ViolationTypeEntity]:
-        return list(
-            self.session.scalars(
-                select(ViolationTypeEntity)
-            )
-            .all()
-        )
 
     def update(self, type_id: int, type_name: str, default_fine: Decimal, description: str) -> ViolationTypeEntity:
         type_obj = self.session.get(ViolationTypeEntity, type_id)
