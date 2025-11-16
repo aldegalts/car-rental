@@ -1,2 +1,3 @@
 from .update_client_use_case import UpdateClientUseCase
 from .create_client_use_case import CreateClientUseCase
+from .get_all_clients_use_case import GetAllClientsUseCase

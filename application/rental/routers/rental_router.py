@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from application.dependencies import get_current_user
-from application.rental.schemas import RentalRead, RentalCreate, RentalUpdate
+from application.rental.schemas import RentalRead, RentalCreate, RentalUpdate, RentalFilter
 from application.rental.usecases import CreateRentalUseCase, DeleteRentalUseCase, GetAllUserRentalsUseCase, \
-    UpdateRentalUseCase, GetUserRentalByIdUseCase
+    UpdateRentalUseCase, GetUserRentalByIdUseCase, GetAllRentalsUseCase, GetRentalByIdUseCase
 from infrastructure.database.database_session import get_db
 
 router = APIRouter(prefix="/rentals", tags=["Rentals"])
@@ -38,13 +38,24 @@ def delete_rental(
 
 
 @router.get("/", response_model=List[RentalRead])
+def get_all_rentals(filters: RentalFilter, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if current_user.role.role_name != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can view all rentals")
+
+    return GetAllRentalsUseCase(db).execute(filters)
+
+
+@router.get("/my", response_model=List[RentalRead])
 def get_all_user_rentals(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return GetAllUserRentalsUseCase(db).execute(current_user.id)
 
 
 @router.get("/{rental_id}", response_model=RentalRead)
 def get_user_rental_by_id(rental_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    return GetUserRentalByIdUseCase(db).execute(current_user.id, rental_id)
+    if current_user.role.role_name == "admin":
+        return GetRentalByIdUseCase(db).execute(rental_id)
+    elif current_user.role.role_name == "user":
+        return GetUserRentalByIdUseCase(db).execute(current_user.id, rental_id)
 
 
 @router.put("/{rental_id}", response_model=RentalRead)
