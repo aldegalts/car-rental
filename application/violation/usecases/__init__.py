@@ -1,4 +1,4 @@
 from .update_violation_use_case import UpdateViolationUseCase
 from .create_violation_use_case import CreateViolationUseCase
 from .delete_violation_use_case import DeleteViolationUseCase
-from .get_all_violation_use_case import GetAllViolationUseCase
+from .get_all_violation_use_case import GetAllUserViolationsUseCase

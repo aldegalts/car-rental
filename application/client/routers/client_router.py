@@ -14,15 +14,22 @@ router = APIRouter(prefix="/client", tags=["Client"])
 @router.post("/", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
 def add_client(
     client_data: ClientCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
-    return CreateClientUseCase(db).execute(client_data)
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user can add client")
 
+    return CreateClientUseCase(db).execute(client_data)
 
 
 @router.put("/{client_id}", response_model=ClientRead)
 def update_client(
     client_data: ClientUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
+    if current_user != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update clients")
+
     return UpdateClientUseCase(db).execute(client_data)
