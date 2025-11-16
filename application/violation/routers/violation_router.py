@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from application.dependencies import get_current_user
 from application.violation.schemas import ViolationRead, ViolationCreate, ViolationUpdate
 from application.violation.usecases import CreateViolationUseCase, DeleteViolationUseCase, GetAllUserViolationsUseCase, \
-    UpdateViolationUseCase
+    UpdateViolationUseCase, GetViolationByIdUseCase, GetUserViolationByIdUseCase
 from infrastructure.database.database_session import get_db
 
 router = APIRouter(prefix="/violations", tags=["Violations"])
@@ -40,6 +40,14 @@ def delete_violation(
 @router.get("/", response_model=List[ViolationRead])
 def get_all_violations(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return GetAllUserViolationsUseCase(db).execute(current_user.id)
+
+
+@router.get("/{violation_id}", response_model=ViolationRead)
+def get_violation_by_id(violation_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if current_user.role.role_name == "admin":
+        return GetViolationByIdUseCase(db).execute(violation_id)
+    elif current_user.role.role_name == "user":
+        return GetUserViolationByIdUseCase(db).execute(current_user.id, violation_id)
 
 
 @router.put("/{violation_id}", response_model=ViolationRead)

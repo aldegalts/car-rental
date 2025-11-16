@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from application.client.schemas import ClientRead, ClientCreate, ClientUpdate
-from application.client.usecases import CreateClientUseCase, UpdateClientUseCase
+from application.client.usecases import CreateClientUseCase, UpdateClientUseCase, GetAllClientsUseCase
+from application.client.usecases.get_client_by_id_use_case import GetClientByIdUseCase
 from application.dependencies import get_current_user
 from infrastructure.database.database_session import get_db
 
-router = APIRouter(prefix="/client", tags=["Client"])
+router = APIRouter(prefix="/clients", tags=["Client"])
 
 
 @router.post("/", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
@@ -21,6 +22,30 @@ def add_client(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user can add client")
 
     return CreateClientUseCase(db).execute(client_data)
+
+
+@router.get("/", response_model=List[ClientRead])
+def get_all_clients(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if current_user.role.role_name != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get all clients")
+
+    return GetAllClientsUseCase(db).execute()
+
+
+@router.get("/{client_id}", response_model=ClientRead)
+def get_client_by_id(client_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if current_user.role.role_name != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get client by id")
+
+    return GetClientByIdUseCase(db).execute(client_id)
+
+
+@router.get("/profile", response_model=ClientRead)
+def get_profile(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if current_user.role.role_name != "user":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only user can get his profile")
+
+    return GetClientByIdUseCase(db).execute(current_user.client.id)
 
 
 @router.put("/{client_id}", response_model=ClientRead)

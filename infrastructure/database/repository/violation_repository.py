@@ -62,3 +62,13 @@ class ViolationRepository:
             .filter(ViolationEntity.rental.client.user_id == user_id)
             .all()
         )
+
+    def get_by_user_and_id(self, user_id: int, violation_id: int):
+        return (
+            self.session.query(ViolationEntity)
+            .filter(
+                ViolationEntity.id == violation_id,
+                ViolationEntity.rental.client.user_id == user_id
+            )
+            .first()
+        )

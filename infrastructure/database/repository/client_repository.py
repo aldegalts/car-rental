@@ -1,6 +1,7 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from infrastructure.database.models import ClientEntity
@@ -32,6 +33,14 @@ class ClientRepository:
 
     def get_by_id(self, client_id: int) -> Optional[ClientEntity]:
         return self.session.get(ClientEntity, client_id)
+
+    def get_all(self) -> List[ClientEntity]:
+        return list(
+            self.session.scalars(
+                select(ClientEntity)
+            )
+            .all()
+        )
 
     def update(
             self, client_id: int, name: str, surname: str, phone: str, email: str, driver_license: str

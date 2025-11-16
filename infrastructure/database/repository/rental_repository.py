@@ -2,10 +2,10 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List
 
-from sqlalchemy import select
+from sqlalchemy import select, and_, func
 from sqlalchemy.orm import Session
 
-from infrastructure.database.models import RentalEntity
+from infrastructure.database.models import RentalEntity, ViolationEntity
 
 
 class RentalRepository:
@@ -78,3 +78,48 @@ class RentalRepository:
             )
             .first()
         )
+
+    def filter(
+            self,
+            car_id: Optional[int] = None,
+            client_id: Optional[int] = None
+    ) -> List[RentalEntity]:
+        query = select(RentalEntity)
+
+        filters = []
+        if car_id:
+            filters.append(RentalEntity.car_id == car_id)
+        if client_id:
+            filters.append(RentalEntity.client_id == client_id)
+
+        if filters:
+            query = query.where(and_(*filters))
+
+        return list(self.session.scalars(query).all())
+
+    def statistic_get_rentals(self, start_date: datetime, end_date: datetime):
+        base_query = (
+            select(RentalEntity)
+            .where(RentalEntity.start_date >= start_date)
+            .where(RentalEntity.end_date <= end_date)
+        )
+        rentals = list(self.session.scalars(base_query).all())
+
+        total_count = len(rentals)
+
+        if total_count == 0:
+            return rentals, 0, 0
+
+        violation_count_query = (
+            select(func.count(func.distinct(ViolationEntity.rental_id)))
+            .join(RentalEntity, RentalEntity.id == ViolationEntity.rental_id)
+            .where(RentalEntity.start_date >= start_date)
+            .where(RentalEntity.end_date <= end_date)
+        )
+
+        violation_count = self.session.scalar(violation_count_query) or 0
+
+        percent_with_violations = (violation_count / total_count) * 100
+        percent_without_violations = 100 - percent_with_violations
+
+        return rentals, percent_with_violations, percent_without_violations
