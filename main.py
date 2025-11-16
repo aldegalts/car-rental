@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from application.admin.routers import documentation_router
-from application.auth.routers import auth, auth_swagger
+from application.auth.routers import auth
 from application.car.routers import car_router
 from application.car_category.routers import car_category_router
 from application.car_color.routers import car_color_router
@@ -23,7 +23,3 @@ app.include_router(rental_router.router)
 app.include_router(violation_type_router.router)
 app.include_router(violation_router.router)
 app.include_router(documentation_router.router)
-
-
-
-app.include_router(auth_swagger.router)

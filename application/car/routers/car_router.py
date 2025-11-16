@@ -8,17 +8,23 @@ from application.car.usecases import CreateCarUseCase, DeleteCarUseCase, GetAllC
     GetCarUseCase, FilterCarUseCase
 from application.dependencies import get_current_user
 from infrastructure.database.database_session import get_db
+from infrastructure.database.models import UserEntity
 
 router = APIRouter(prefix="/cars", tags=["Cars"])
 
 
 @router.get("/", response_model=List[CarRead])
-def get_all_cars(db: Session = Depends(get_db)):
+def get_all_cars(
+        db: Session = Depends(get_db)
+):
     return GetAllCarUseCase(db).execute()
 
 
-@router.get("/{id}", response_model=CarRead)
-def get_car_by_id(car_id: int, db: Session = Depends(get_db)):
+@router.get("/{car_id}", response_model=CarRead)
+def get_car_by_id(
+        car_id: int,
+        db: Session = Depends(get_db)
+):
     return GetCarUseCase(db).execute(car_id)
 
 
@@ -33,8 +39,8 @@ def filter_cars(
 @router.post("/", response_model=CarRead, status_code=status.HTTP_201_CREATED)
 def add_car(
     car_data: CarCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create cars")
@@ -45,8 +51,8 @@ def add_car(
 @router.delete("/{car_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_car(
     car_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete cars")
@@ -58,8 +64,8 @@ def delete_car(
 @router.put("/{car_id}", response_model=CarRead)
 def update_car(
     car_data: CarUpdate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update cars")

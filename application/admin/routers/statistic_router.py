@@ -16,7 +16,7 @@ def get_rental_stats(
     start_date: datetime,
     end_date: datetime,
     current_user: UserEntity = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(

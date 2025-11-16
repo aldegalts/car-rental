@@ -8,18 +8,26 @@ from application.car_color.usecases import CreateCarColorUseCase, DeleteCarColor
     UpdateCarColorUseCase
 from application.dependencies import get_current_user
 from infrastructure.database.database_session import get_db
+from infrastructure.database.models import UserEntity
 
 router = APIRouter(prefix="/car_colors", tags=["Car Colors"])
+
+
+@router.get("/", response_model=List[CarColorRead])
+def get_all_colors(
+        db: Session = Depends(get_db)
+):
+    return GetAllCarColorsUseCase(db).execute()
 
 
 @router.post("/", response_model=CarColorRead, status_code=status.HTTP_201_CREATED)
 def add_color(
     color_data: CarColorCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create car colors")
 
     return CreateCarColorUseCase(db).execute(color_data)
 
@@ -27,28 +35,23 @@ def add_color(
 @router.delete("/{color_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_color(
     color_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete car colors")
 
     DeleteCarColorUseCase(db).execute(color_id)
     return {"detail": "Color deleted successfully"}
 
 
-@router.get("/", response_model=List[CarColorRead])
-def get_all_colors(db: Session = Depends(get_db)):
-    return GetAllCarColorsUseCase(db).execute()
-
-
 @router.put("/{color_id}", response_model=CarColorRead)
 def update_color(
     color_data: CarColorUpdate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update car colors")
 
     return UpdateCarColorUseCase(db).execute(color_data)

@@ -8,15 +8,23 @@ from application.rental_status.schemas import RentalStatusRead, RentalStatusCrea
 from application.rental_status.usecases import CreateRentalStatusUseCase, DeleteRentalStatusUseCase, \
     GetAllRentalStatusesUseCase, UpdateRentalStatusUseCase
 from infrastructure.database.database_session import get_db
+from infrastructure.database.models import UserEntity
 
 router = APIRouter(prefix="/rental_statuses", tags=["Rental Statuses"])
+
+
+@router.get("/", response_model=List[RentalStatusRead])
+def get_all_statuses(
+        db: Session = Depends(get_db)
+):
+    return GetAllRentalStatusesUseCase(db).execute()
 
 
 @router.post("/", response_model=RentalStatusRead, status_code=status.HTTP_201_CREATED)
 def add_status(
     status_data: RentalStatusCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create rental statuses")
@@ -27,8 +35,8 @@ def add_status(
 @router.delete("/{status_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_status(
     status_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete rental statuses")
@@ -37,17 +45,11 @@ def delete_status(
     return {"detail": "Rental status deleted successfully"}
 
 
-@router.get("/", response_model=List[RentalStatusRead])
-def get_all_statuses(db: Session = Depends(get_db)):
-    return GetAllRentalStatusesUseCase(db).execute()
-
-
-
 @router.put("/{status_id}", response_model=RentalStatusRead)
 def update_status(
     status_data: RentalStatusUpdate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update rental statuses")

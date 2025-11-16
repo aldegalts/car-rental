@@ -8,15 +8,23 @@ from application.car_status.usecases import CreateCarStatusUseCase, DeleteCarSta
     UpdateCarStatusUseCase
 from application.dependencies import get_current_user
 from infrastructure.database.database_session import get_db
+from infrastructure.database.models import UserEntity
 
 router = APIRouter(prefix="/car_statuses", tags=["Car Statuses"])
+
+
+@router.get("/", response_model=List[CarStatusRead])
+def get_all_statuses(
+        db: Session = Depends(get_db)
+):
+    return GetAllCarStatusesUseCase(db).execute()
 
 
 @router.post("/", response_model=CarStatusRead, status_code=status.HTTP_201_CREATED)
 def add_status(
     status_data: CarStatusCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create car statuses")
@@ -27,8 +35,8 @@ def add_status(
 @router.delete("/{status_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_status(
     status_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete car statuses")
@@ -37,17 +45,11 @@ def delete_status(
     return {"detail": "Car status deleted successfully"}
 
 
-@router.get("/", response_model=List[CarStatusRead])
-def get_all_statuses(db: Session = Depends(get_db)):
-    return GetAllCarStatusesUseCase(db).execute()
-
-
-
 @router.put("/{status_id}", response_model=CarStatusRead)
 def update_status(
     status_data: CarStatusUpdate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserEntity = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update car statuses")
