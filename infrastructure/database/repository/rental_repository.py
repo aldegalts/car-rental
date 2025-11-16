@@ -61,3 +61,20 @@ class RentalRepository:
             )
             .all()
         )
+
+    def get_by_user_id(self, user_id: int) -> List[RentalEntity]:
+        return (
+            self.session.query(RentalEntity)
+            .filter(RentalEntity.client.user_id == user_id)
+            .all()
+        )
+
+    def get_by_user_and_id(self, user_id: int, rental_id: int):
+        return (
+            self.session.query(RentalEntity)
+            .filter(
+                RentalEntity.id == rental_id,
+                RentalEntity.user_id == user_id
+            )
+            .first()
+        )

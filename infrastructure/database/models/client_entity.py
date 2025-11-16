@@ -18,3 +18,4 @@ class ClientEntity(Base):
     user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False, unique=True)
 
     user = relationship("UserEntity", back_populates="client")
+    rentals = relationship("RentalEntity", back_populates="client", cascade="all, delete-orphan")

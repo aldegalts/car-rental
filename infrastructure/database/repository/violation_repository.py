@@ -56,10 +56,9 @@ class ViolationRepository:
             self.session.delete(violation)
             self.session.commit()
 
-    def get_all(self) -> List[ViolationEntity]:
-        return list(
-            self.session.scalars(
-                select(ViolationEntity)
-            )
+    def get_by_user_id(self, user_id: int) -> List[ViolationEntity]:
+        return (
+            self.session.query(ViolationEntity)
+            .filter(ViolationEntity.rental.client.user_id == user_id)
             .all()
         )

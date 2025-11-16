@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from application.dependencies import get_current_user
 from application.violation.schemas import ViolationRead, ViolationCreate, ViolationUpdate
-from application.violation.usecases import CreateViolationUseCase, DeleteViolationUseCase, GetAllViolationUseCase, \
+from application.violation.usecases import CreateViolationUseCase, DeleteViolationUseCase, GetAllUserViolationsUseCase, \
     UpdateViolationUseCase
 from infrastructure.database.database_session import get_db
 
@@ -38,12 +38,12 @@ def delete_violation(
 
 
 @router.get("/", response_model=List[ViolationRead])
-def get_all_cars(db: Session = Depends(get_db)):
-    return GetAllViolationUseCase(db).execute()
+def get_all_violations(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    return GetAllUserViolationsUseCase(db).execute(current_user.id)
 
 
 @router.put("/{violation_id}", response_model=ViolationRead)
-def update_car(
+def update_violation(
     violation_data: ViolationUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)

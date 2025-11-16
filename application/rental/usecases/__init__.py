@@ -1,4 +1,5 @@
 from .create_rental_use_case import CreateRentalUseCase
 from .delete_rental_use_case import DeleteRentalUseCase
 from .update_rental_use_case import UpdateRentalUseCase
-from .get_all_rental_use_case import GetAllRentalUseCase
+from .get_all_user_rentals_use_case import GetAllUserRentalsUseCase
+from .get_user_rental_by_id_use_case import GetUserRentalByIdUseCase

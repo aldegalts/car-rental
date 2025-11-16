@@ -17,3 +17,4 @@ class RentalEntity(Base):
 
     violations = relationship("ViolationEntity", back_populates="rental", cascade="all, delete-orphan")
     rental_status = relationship("RentalStatusEntity", back_populates="rentals")
+    client = relationship("ClientEntity", back_populates="rentals")
