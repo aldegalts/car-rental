@@ -5,20 +5,17 @@
 {% block content %}
 <h2>Типы нарушений</h2>
 {% if violation_types %}
-<div class="row">
     {% for type in violation_types %}
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ type.type_name }}</h5>
-                {% if type.description %}
-                <p class="card-text">{{ type.description }}</p>
-                {% endif %}
-            </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ type.type_name }}</h5>
+            <p class="mb-2"><strong>Штраф:</strong> {{ type.default_fine }} ₽</p>
+            {% if type.description %}
+            <p class="card-text mb-0">{{ type.description }}</p>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
-</div>
 {% else %}
 <div class="alert alert-info">
     <p>Типы нарушений не найдены.</p>
