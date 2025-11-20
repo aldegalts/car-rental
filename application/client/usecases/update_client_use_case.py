@@ -18,7 +18,7 @@ class UpdateClientUseCase:
         client_res = self.client_repo.update(
             client_id=client_data.id,
             name = client_data.name,
-            surname = client_data.username,
+            surname = client_data.surname,
             phone = client_data.phone,
             email = client_data.email,
             driver_license = client_data.driver_license

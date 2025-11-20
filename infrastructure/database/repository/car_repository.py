@@ -66,6 +66,13 @@ class CarRepository:
         self.session.refresh(car_obj)
         return car_obj
 
+    def update_status(self, car_id: int, car_status_id: int) -> CarEntity:
+        car_obj = self.session.get(CarEntity, car_id)
+        car_obj.car_status_id = car_status_id
+        self.session.commit()
+        self.session.refresh(car_obj)
+        return car_obj
+
     def filter(
             self,
             brand: Optional[str] = None,

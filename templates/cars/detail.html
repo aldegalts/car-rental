@@ -32,12 +32,14 @@
                 <td><strong>{{ car.daily_cost }} ₽</strong></td>
             </tr>
         </table>
-        {% if current_user and current_user.role.role_name == "user" %}
-        <a href="/rentals/create/{{ car.id }}" class="btn btn-success btn-lg">Забронировать</a>
-        {% elif not current_user %}
-        <a href="/login" class="btn btn-success btn-lg">Войти для бронирования</a>
-        {% endif %}
-        <a href="/catalog" class="btn btn-secondary">Назад к каталогу</a>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            {% if current_user and current_user.role.role_name == "user" %}
+            <a href="/rentals/create/{{ car.id }}" class="btn btn-success btn-lg flex-fill">Арендовать</a>
+            {% elif not current_user %}
+            <a href="/login" class="btn btn-success btn-lg flex-fill">Войти для аренды</a>
+            {% endif %}
+            <a href="/catalog" class="btn btn-secondary btn-lg flex-fill">Назад к каталогу</a>
+        </div>
     </div>
 </div>
 {% endblock %}

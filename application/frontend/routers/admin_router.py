@@ -37,7 +37,8 @@ async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
         clients_resp = await client.get(f"{BASE_URL}/clients/")
         clients_count = len(clients_resp.json()) if clients_resp.status_code == 200 else 0
         
-        rentals_resp = await client.get(f"{BASE_URL}/rentals/", params={})
+        # Для получения всех аренд не передаем параметры - FastAPI создаст пустой RentalFilter
+        rentals_resp = await client.get(f"{BASE_URL}/rentals/")
         rentals_count = len(rentals_resp.json()) if rentals_resp.status_code == 200 else 0
     
     return templates.TemplateResponse(
@@ -194,8 +195,8 @@ async def admin_client_edit_submit(
 @router.get("/admin/rentals", response_class=HTMLResponse)
 async def admin_rentals(
     request: Request,
-    car_id: Optional[int] = Query(None),
-    client_id: Optional[int] = Query(None),
+    car_id: Optional[str] = Query(None),
+    client_id: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
     """Список аренд с фильтрацией"""
@@ -204,13 +205,33 @@ async def admin_rentals(
     
     cookies = dict(request.cookies)
     filters = {}
-    if car_id:
-        filters["car_id"] = car_id
-    if client_id:
-        filters["client_id"] = client_id
+    params = {}
+    
+    # Обрабатываем пустые строки как None и конвертируем в int
+    def parse_int_or_none(value: Optional[str]) -> Optional[int]:
+        if value is None or value == "":
+            return None
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
+    
+    car_id_int = parse_int_or_none(car_id)
+    client_id_int = parse_int_or_none(client_id)
+    
+    if car_id_int:
+        filters["car_id"] = car_id_int
+        params["car_id"] = car_id_int
+    if client_id_int:
+        filters["client_id"] = client_id_int
+        params["client_id"] = client_id_int
     
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
-        response = await client.get(f"{BASE_URL}/rentals/", params=filters)
+        # Если есть фильтры, передаем их, иначе не передаем params вообще
+        if params:
+            response = await client.get(f"{BASE_URL}/rentals/", params=params)
+        else:
+            response = await client.get(f"{BASE_URL}/rentals/")
         rentals = response.json() if response.status_code == 200 else []
         
         # Получаем дополнительные данные
@@ -417,10 +438,28 @@ async def admin_statistics(
     stats = None
     
     if start_date and end_date:
+        # Конвертируем datetime-local формат в ISO формат для API
+        # datetime-local: "2025-11-20T10:00" -> ISO: "2025-11-20T10:00:00"
+        try:
+            # Если дата уже в правильном формате, оставляем как есть
+            # Иначе добавляем секунды если их нет
+            if len(start_date) == 16:  # "YYYY-MM-DDTHH:mm"
+                start_date_iso = start_date + ":00"
+            else:
+                start_date_iso = start_date
+            
+            if len(end_date) == 16:  # "YYYY-MM-DDTHH:mm"
+                end_date_iso = end_date + ":00"
+            else:
+                end_date_iso = end_date
+        except Exception:
+            start_date_iso = start_date
+            end_date_iso = end_date
+        
         async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
             response = await client.get(
                 f"{BASE_URL}/admin/rental-statistic",
-                params={"start_date": start_date, "end_date": end_date}
+                params={"start_date": start_date_iso, "end_date": end_date_iso}
             )
             if response.status_code == 200:
                 stats = response.json()

@@ -130,10 +130,8 @@ async def create_rental_page(
             return RedirectResponse(url="/catalog", status_code=302)
         
         car = car_resp.json()
-        
-        # Получаем статусы аренд
-        status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
-        statuses = status_resp.json() if status_resp.status_code == 200 else []
+
+    start_date_value = datetime.now().strftime("%Y-%m-%dT%H:%M")
     
     return templates.TemplateResponse(
         "rentals/create.html",
@@ -142,7 +140,7 @@ async def create_rental_page(
             "current_user": current_user,
             "car": car,
             "client": client_data,
-            "statuses": statuses
+            "start_date_value": start_date_value
         }
     )
 
@@ -151,9 +149,7 @@ async def create_rental_page(
 async def create_rental_submit(
     request: Request,
     car_id: int = Form(...),
-    start_date: str = Form(...),
     end_date: str = Form(...),
-    rental_status_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
     """Обработка формы создания аренды"""
@@ -180,18 +176,35 @@ async def create_rental_submit(
         car = car_resp.json()
         
         # Рассчитываем количество дней и общую стоимость
-        start = datetime.fromisoformat(start_date.replace("T", " "))
+        start = datetime.now()
         end = datetime.fromisoformat(end_date.replace("T", " "))
+
+        if end < start:
+            error = "Дата окончания не может быть раньше сегодняшнего дня"
+            start_date_value = start.strftime("%Y-%m-%dT%H:%M")
+            return templates.TemplateResponse(
+                "rentals/create.html",
+                {
+                    "request": request,
+                    "current_user": current_user,
+                    "car": car,
+                    "client": client_data,
+                    "error": error,
+                    "start_date_value": start_date_value
+                }
+            )
+
+        start = start.replace(second=0, microsecond=0)
         days = (end - start).days + 1
         total_amount = float(car["daily_cost"]) * days
         
         rental_data = {
             "client_id": client_data["id"],
             "car_id": car_id,
-            "start_date": start_date,
+            "start_date": start.isoformat(),
             "end_date": end_date,
             "total_amount": str(total_amount),
-            "rental_status_id": rental_status_id
+            "rental_status_id": None
         }
         
         response = await client.post(f"{BASE_URL}/rentals/", json=rental_data)
@@ -201,6 +214,7 @@ async def create_rental_submit(
             return RedirectResponse(url=f"/account/rentals/{rental['id']}", status_code=302)
         else:
             error = response.json().get("detail", "Ошибка при создании аренды")
+            start_date_value = start.strftime("%Y-%m-%dT%H:%M")
             return templates.TemplateResponse(
                 "rentals/create.html",
                 {
@@ -208,7 +222,8 @@ async def create_rental_submit(
                     "current_user": current_user,
                     "car": car,
                     "client": client_data,
-                    "error": error
+                    "error": error,
+                    "start_date_value": start_date_value
                 }
             )
 

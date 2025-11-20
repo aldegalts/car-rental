@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from application.admin.routers import documentation_router
+from application.admin.routers import documentation_router, statistic_router
 from application.auth.routers import auth
 from application.car.routers import car_router
 from application.car_category.routers import car_category_router
@@ -30,6 +30,7 @@ app.include_router(violation_type_router.router)
 app.include_router(violation_router.router)
 app.include_router(client_router.router)
 app.include_router(documentation_router.router)
+app.include_router(statistic_router.router)
 
 # Фронтенд роутеры
 app.include_router(frontend_router.router)

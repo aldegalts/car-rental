@@ -5,7 +5,7 @@ from typing import Optional, List
 from sqlalchemy import select, and_, func
 from sqlalchemy.orm import Session
 
-from infrastructure.database.models import RentalEntity, ViolationEntity
+from infrastructure.database.models import RentalEntity, ViolationEntity, ClientEntity
 
 
 class RentalRepository:
@@ -18,16 +18,18 @@ class RentalRepository:
     def get_by_user_id(self, user_id: int) -> List[RentalEntity]:
         return (
             self.session.query(RentalEntity)
-            .filter(RentalEntity.client.user_id == user_id)
+            .join(ClientEntity, RentalEntity.client_id == ClientEntity.id)
+            .filter(ClientEntity.user_id == user_id)
             .all()
         )
 
     def get_by_user_and_id(self, user_id: int, rental_id: int):
         return (
             self.session.query(RentalEntity)
+            .join(ClientEntity, RentalEntity.client_id == ClientEntity.id)
             .filter(
                 RentalEntity.id == rental_id,
-                RentalEntity.user_id == user_id
+                ClientEntity.user_id == user_id
             )
             .first()
         )
@@ -74,6 +76,26 @@ class RentalRepository:
         rental_obj.start_date = start_date
         rental_obj.end_date = end_date
         rental_obj.total_amount = total_amount
+        rental_obj.rental_status_id = rental_status_id
+        self.session.commit()
+        self.session.refresh(rental_obj)
+        return rental_obj
+
+    def get_expired_active_rentals(self, active_status_id: int) -> List[RentalEntity]:
+        """Получить активные аренды, у которых истек срок"""
+        now = datetime.now()
+        return (
+            self.session.query(RentalEntity)
+            .filter(
+                RentalEntity.rental_status_id == active_status_id,
+                RentalEntity.end_date < now
+            )
+            .all()
+        )
+
+    def update_status(self, rental_id: int, rental_status_id: int) -> RentalEntity:
+        """Обновить только статус аренды"""
+        rental_obj = self.session.get(RentalEntity, rental_id)
         rental_obj.rental_status_id = rental_status_id
         self.session.commit()
         self.session.refresh(rental_obj)

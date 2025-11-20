@@ -10,6 +10,13 @@ class CarStatusRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_status(self, status: str) -> Optional[CarStatusEntity]:
+        return (
+            self.session.query(CarStatusEntity)
+            .filter(CarStatusEntity.status == status)
+            .first()
+        )
+
     def get_by_id(self, status_id: int) -> Optional[CarStatusEntity]:
         return self.session.get(CarStatusEntity, status_id)
 

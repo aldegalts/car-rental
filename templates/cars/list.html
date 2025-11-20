@@ -78,9 +78,9 @@
                         </p>
                         <a href="/catalog/{{ car.id }}" class="btn btn-primary">Подробнее</a>
                         {% if current_user and current_user.role.role_name == "user" %}
-                        <a href="/rentals/create/{{ car.id }}" class="btn btn-success">Забронировать</a>
+                        <a href="/rentals/create/{{ car.id }}" class="btn btn-success">Арендовать</a>
                         {% elif not current_user %}
-                        <a href="/login" class="btn btn-success">Забронировать</a>
+                        <a href="/login" class="btn btn-success">Войти для аренды</a>
                         {% endif %}
                     </div>
                 </div>

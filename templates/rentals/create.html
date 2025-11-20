@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Создание аренды - Аренда автомобилей{% endblock %}
+{% block title %}Оформление аренды - Аренда автомобилей{% endblock %}
 
 {% block content %}
-<h2>Бронирование автомобиля</h2>
+<h2>Оформление аренды</h2>
 <div class="row">
     <div class="col-md-6">
         <div class="card mb-3">
@@ -21,25 +21,21 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Данные аренды</h5>
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
                 <form method="post" action="/rentals/create">
                     <input type="hidden" name="car_id" value="{{ car.id }}">
                     <div class="mb-3">
                         <label for="start_date" class="form-label">Дата начала *</label>
-                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                        <input type="datetime-local" class="form-control" id="start_date" value="{{ start_date_value or '' }}" readonly>
+                        <small class="text-muted">Аренда всегда начинается сегодня</small>
                     </div>
                     <div class="mb-3">
                         <label for="end_date" class="form-label">Дата окончания *</label>
-                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required min="{{ start_date_value or '' }}">
                     </div>
-                    <div class="mb-3">
-                        <label for="rental_status_id" class="form-label">Статус *</label>
-                        <select class="form-select" id="rental_status_id" name="rental_status_id" required>
-                            {% for status in statuses %}
-                            <option value="{{ status.id }}">{{ status.status }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Забронировать</button>
+                    <button type="submit" class="btn btn-primary">Арендовать</button>
                     <a href="/catalog/{{ car.id }}" class="btn btn-secondary">Отмена</a>
                 </form>
             </div>

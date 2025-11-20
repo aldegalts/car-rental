@@ -15,7 +15,7 @@ class ClientBase(BaseModel):
 
 
 class ClientCreate(ClientBase):
-    id: int
+    pass
 
 
 class ClientUpdate(ClientBase):
