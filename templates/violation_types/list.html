@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Типы нарушений - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<h2>Типы нарушений</h2>
+{% if violation_types %}
+<div class="row">
+    {% for type in violation_types %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ type.name }}</h5>
+                {% if type.description %}
+                <p class="card-text">{{ type.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>Типы нарушений не найдены.</p>
+</div>
+{% endif %}
+{% endblock %}
+

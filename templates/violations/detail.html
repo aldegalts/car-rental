@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Нарушение #{{ violation.id }} - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<h2>Нарушение #{{ violation.id }}</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Информация о нарушении</h5>
+        <table class="table">
+            <tr>
+                <th>Тип нарушения:</th>
+                <td>{{ violation.type.name if violation.type else 'Не указан' }}</td>
+            </tr>
+            <tr>
+                <th>Описание:</th>
+                <td>{{ violation.description }}</td>
+            </tr>
+            <tr>
+                <th>Сумма штрафа:</th>
+                <td><strong>{{ violation.fine_amount }} ₽</strong></td>
+            </tr>
+            <tr>
+                <th>Дата нарушения:</th>
+                <td>{{ violation.violation_date }}</td>
+            </tr>
+            <tr>
+                <th>Статус оплаты:</th>
+                <td>
+                    {% if violation.is_paid %}
+                    <span class="badge bg-success">Оплачено</span>
+                    {% else %}
+                    <span class="badge bg-danger">Не оплачено</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if violation.rental %}
+            <tr>
+                <th>Аренда:</th>
+                <td>
+                    <a href="/rentals/{{ violation.rental.id }}">Аренда #{{ violation.rental.id }}</a>
+                </td>
+            </tr>
+            {% endif %}
+        </table>
+        <a href="/violations" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}
+

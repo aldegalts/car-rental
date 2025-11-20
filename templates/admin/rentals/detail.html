@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Аренда #{{ rental.id }} - Панель администратора{% endblock %}
+
+{% block content %}
+<h2>Аренда #{{ rental.id }}</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Информация об аренде</h5>
+        <table class="table">
+            <tr>
+                <th>Клиент:</th>
+                <td>{{ rental.client.name }} {{ rental.client.surname }}</td>
+            </tr>
+            <tr>
+                <th>Машина:</th>
+                <td>{{ rental.car.brand }} {{ rental.car.model }} ({{ rental.car.license_plate }})</td>
+            </tr>
+            <tr>
+                <th>Дата начала:</th>
+                <td>{{ rental.start_date }}</td>
+            </tr>
+            <tr>
+                <th>Дата окончания:</th>
+                <td>{{ rental.end_date }}</td>
+            </tr>
+            <tr>
+                <th>Общая сумма:</th>
+                <td><strong>{{ rental.total_amount }} ₽</strong></td>
+            </tr>
+            <tr>
+                <th>Статус:</th>
+                <td>{{ rental.status.name if rental.status else 'Не указан' }}</td>
+            </tr>
+        </table>
+        <a href="/admin/rentals/{{ rental.id }}/edit" class="btn btn-warning">Редактировать</a>
+        <form method="post" action="/admin/rentals/{{ rental.id }}/delete" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту аренду?');">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
+        <a href="/admin/rentals" class="btn btn-secondary">Назад</a>
+    </div>
+</div>
+{% endblock %}
+

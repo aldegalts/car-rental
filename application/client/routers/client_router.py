@@ -65,7 +65,7 @@ def update_client(
     current_user: UserEntity = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user != "admin":
+    if current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update clients")
 
     return UpdateClientUseCase(db).execute(client_data)

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Каталог машин - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Фильтры</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="/cars">
+                    <div class="mb-3">
+                        <label for="brand" class="form-label">Марка</label>
+                        <input type="text" class="form-control" id="brand" name="brand" value="{{ filters.brand or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="model" class="form-label">Модель</label>
+                        <input type="text" class="form-control" id="model" name="model" value="{{ filters.model or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Категория</label>
+                        <select class="form-select" id="category_id" name="category_id">
+                            <option value="">Все</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if filters.category_id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="color_id" class="form-label">Цвет</label>
+                        <select class="form-select" id="color_id" name="color_id">
+                            <option value="">Все</option>
+                            {% for color in colors %}
+                            <option value="{{ color.id }}" {% if filters.color_id == color.id %}selected{% endif %}>
+                                {{ color.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="min_year" class="form-label">Год от</label>
+                        <input type="number" class="form-control" id="min_year" name="min_year" value="{{ filters.min_year or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="max_year" class="form-label">Год до</label>
+                        <input type="number" class="form-control" id="max_year" name="max_year" value="{{ filters.max_year or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="min_cost" class="form-label">Цена от</label>
+                        <input type="number" class="form-control" id="min_cost" name="min_cost" value="{{ filters.min_cost or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="max_cost" class="form-label">Цена до</label>
+                        <input type="number" class="form-control" id="max_cost" name="max_cost" value="{{ filters.max_cost or '' }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Применить фильтры</button>
+                    <a href="/cars" class="btn btn-secondary w-100 mt-2">Сбросить</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2>Каталог машин</h2>
+        <div class="row">
+            {% for car in cars %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
+                        <p class="card-text">
+                            <strong>Год:</strong> {{ car.year }}<br>
+                            <strong>Гос. номер:</strong> {{ car.license_plate }}<br>
+                            <strong>Стоимость в день:</strong> {{ car.daily_cost }} ₽
+                        </p>
+                        <a href="/cars/{{ car.id }}" class="btn btn-primary">Подробнее</a>
+                        {% if current_user and current_user.role.role_name == "user" %}
+                        <a href="/rentals/create/{{ car.id }}" class="btn btn-success">Забронировать</a>
+                        {% elif not current_user %}
+                        <a href="/login" class="btn btn-success">Забронировать</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <p class="text-center">Машины не найдены</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

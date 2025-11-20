@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Создание аренды - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<h2>Бронирование автомобиля</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
+                <p class="card-text">
+                    <strong>Год:</strong> {{ car.year }}<br>
+                    <strong>Гос. номер:</strong> {{ car.license_plate }}<br>
+                    <strong>Стоимость в день:</strong> {{ car.daily_cost }} ₽
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Данные аренды</h5>
+                <form method="post" action="/rentals/create">
+                    <input type="hidden" name="car_id" value="{{ car.id }}">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Дата начала *</label>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">Дата окончания *</label>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rental_status_id" class="form-label">Статус *</label>
+                        <select class="form-select" id="rental_status_id" name="rental_status_id" required>
+                            {% for status in statuses %}
+                            <option value="{{ status.id }}">{{ status.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Забронировать</button>
+                    <a href="/cars/{{ car.id }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
