@@ -35,7 +35,7 @@ async def make_api_request(method: str, url: str, data: dict = None, cookies: di
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Главная страница - редирект на каталог"""
-    return RedirectResponse(url="/cars", status_code=302)
+    return RedirectResponse(url="/catalog", status_code=302)
 
 
 @router.get("/login", response_class=HTMLResponse)

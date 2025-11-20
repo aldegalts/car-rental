@@ -7,12 +7,12 @@ from application.frontend.utils import get_current_user_async
 from infrastructure.database.database_session import get_db
 import httpx
 
-router = APIRouter(tags=["Frontend Violations"])
+router = APIRouter(tags=["Frontend Violations"], include_in_schema=False)
 
 BASE_URL = "http://localhost:8000"
 
 
-@router.get("/violations", response_class=HTMLResponse)
+@router.get("/account/violations", response_class=HTMLResponse)
 async def my_violations(request: Request, db: Session = Depends(get_db)):
     """Страница моих нарушений"""
     current_user = await get_current_user_async(request, db)
@@ -51,7 +51,7 @@ async def my_violations(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/violations/{violation_id}", response_class=HTMLResponse)
+@router.get("/account/violations/{violation_id}", response_class=HTMLResponse)
 async def violation_detail(
     request: Request,
     violation_id: int,
@@ -69,7 +69,7 @@ async def violation_detail(
         response = await client.get(f"{BASE_URL}/violations/{violation_id}")
         
         if response.status_code != 200:
-            return RedirectResponse(url="/violations", status_code=302)
+            return RedirectResponse(url="/account/violations", status_code=302)
         
         violation = response.json()
         
@@ -93,7 +93,7 @@ async def violation_detail(
     )
 
 
-@router.get("/violation_types", response_class=HTMLResponse)
+@router.get("/info/violation-types", response_class=HTMLResponse)
 async def violation_types_list(request: Request, db: Session = Depends(get_db)):
     """Страница списка типов нарушений (доступна всем)"""
     current_user = await get_current_user_async(request, db)

@@ -35,12 +35,12 @@
                         <label for="rental_status_id" class="form-label">Статус *</label>
                         <select class="form-select" id="rental_status_id" name="rental_status_id" required>
                             {% for status in statuses %}
-                            <option value="{{ status.id }}">{{ status.name }}</option>
+                            <option value="{{ status.id }}">{{ status.status }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Забронировать</button>
-                    <a href="/cars/{{ car.id }}" class="btn btn-secondary">Отмена</a>
+                    <a href="/catalog/{{ car.id }}" class="btn btn-secondary">Отмена</a>
                 </form>
             </div>
         </div>

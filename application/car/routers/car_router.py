@@ -1,4 +1,5 @@
-from typing import List
+from decimal import Decimal
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -20,20 +21,38 @@ def get_all_cars(
     return GetAllCarUseCase(db).execute()
 
 
+@router.get("/filter", response_model=List[CarRead])
+def filter_cars(
+    brand: Optional[str] = None,
+    model: Optional[str] = None,
+    category_id: Optional[int] = None,
+    color_id: Optional[int] = None,
+    min_year: Optional[int] = None,
+    max_year: Optional[int] = None,
+    min_cost: Optional[Decimal] = None,
+    max_cost: Optional[Decimal] = None,
+    db: Session = Depends(get_db)
+):
+    filters = CarFilter(
+        brand=brand,
+        model=model,
+        category_id=category_id,
+        color_id=color_id,
+        min_year=min_year,
+        max_year=max_year,
+        min_cost=min_cost,
+        max_cost=max_cost,
+    )
+
+    return FilterCarUseCase(db).execute(filters)
+
+
 @router.get("/{car_id}", response_model=CarRead)
 def get_car_by_id(
         car_id: int,
         db: Session = Depends(get_db)
 ):
     return GetCarUseCase(db).execute(car_id)
-
-
-@router.get("/filter", response_model=List[CarRead])
-def filter_cars(
-    filters: CarFilter,
-    db: Session = Depends(get_db)
-):
-    return FilterCarUseCase(db).execute(filters)
 
 
 @router.post("/", response_model=CarRead, status_code=status.HTTP_201_CREATED)

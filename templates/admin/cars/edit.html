@@ -26,7 +26,7 @@
                         <select class="form-select" id="category_id" name="category_id" required>
                             {% for category in categories %}
                             <option value="{{ category.id }}" {% if car.category_id == category.id %}selected{% endif %}>
-                                {{ category.name }}
+                                {{ category.category_name }}
                             </option>
                             {% endfor %}
                         </select>
@@ -40,7 +40,7 @@
                         <select class="form-select" id="color_id" name="color_id" required>
                             {% for color in colors %}
                             <option value="{{ color.id }}" {% if car.color_id == color.id %}selected{% endif %}>
-                                {{ color.name }}
+                                {{ color.color }}
                             </option>
                             {% endfor %}
                         </select>
@@ -54,7 +54,7 @@
                         <select class="form-select" id="car_status_id" name="car_status_id" required>
                             {% for status in statuses %}
                             <option value="{{ status.id }}" {% if car.car_status_id == status.id %}selected{% endif %}>
-                                {{ status.name }}
+                                {{ status.status }}
                             </option>
                             {% endfor %}
                         </select>

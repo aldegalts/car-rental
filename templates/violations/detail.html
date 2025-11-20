@@ -10,7 +10,7 @@
         <table class="table">
             <tr>
                 <th>Тип нарушения:</th>
-                <td>{{ violation.type.name if violation.type else 'Не указан' }}</td>
+                <td>{{ violation.type.type_name if violation.type else 'Не указан' }}</td>
             </tr>
             <tr>
                 <th>Описание:</th>
@@ -38,12 +38,12 @@
             <tr>
                 <th>Аренда:</th>
                 <td>
-                    <a href="/rentals/{{ violation.rental.id }}">Аренда #{{ violation.rental.id }}</a>
+                    <a href="/account/rentals/{{ violation.rental.id }}">Аренда #{{ violation.rental.id }}</a>
                 </td>
             </tr>
             {% endif %}
         </table>
-        <a href="/violations" class="btn btn-secondary">Назад к списку</a>
+        <a href="/account/violations" class="btn btn-secondary">Назад к списку</a>
     </div>
 </div>
 {% endblock %}

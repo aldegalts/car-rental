@@ -64,7 +64,7 @@
                 <td>{{ rental.start_date }}</td>
                 <td>{{ rental.end_date }}</td>
                 <td>{{ rental.total_amount }} ₽</td>
-                <td>{{ rental.status.name if rental.status else 'Не указан' }}</td>
+                <td>{{ rental.status.status if rental.status else 'Не указан' }}</td>
                 <td>
                     <a href="/admin/rentals/{{ rental.id }}" class="btn btn-sm btn-primary">Просмотр</a>
                     <a href="/admin/rentals/{{ rental.id }}/edit" class="btn btn-sm btn-warning">Редактировать</a>

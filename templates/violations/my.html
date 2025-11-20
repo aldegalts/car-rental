@@ -22,7 +22,7 @@
             {% for violation in violations %}
             <tr>
                 <td>{{ violation.id }}</td>
-                <td>{{ violation.type.name if violation.type else 'Не указан' }}</td>
+                <td>{{ violation.type.type_name if violation.type else 'Не указан' }}</td>
                 <td>{{ violation.description }}</td>
                 <td>{{ violation.fine_amount }} ₽</td>
                 <td>{{ violation.violation_date }}</td>
@@ -34,7 +34,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="/violations/{{ violation.id }}" class="btn btn-sm btn-primary">Подробнее</a>
+                    <a href="/account/violations/{{ violation.id }}" class="btn btn-sm btn-primary">Подробнее</a>
                 </td>
             </tr>
             {% endfor %}

@@ -32,12 +32,12 @@
                 <td>{{ car.model }}</td>
                 <td>{{ car.year }}</td>
                 <td>{{ car.license_plate }}</td>
-                <td>{{ car.category.name if car.category else 'Не указана' }}</td>
-                <td>{{ car.color.name if car.color else 'Не указан' }}</td>
-                <td>{{ car.status.name if car.status else 'Не указан' }}</td>
+                <td>{{ car.category.category_name if car.category else 'Не указана' }}</td>
+                <td>{{ car.color.color if car.color else 'Не указан' }}</td>
+                <td>{{ car.status.status if car.status else 'Не указан' }}</td>
                 <td>{{ car.daily_cost }} ₽</td>
                 <td>
-                    <a href="/cars/{{ car.id }}" class="btn btn-sm btn-primary">Просмотр</a>
+                    <a href="/catalog/{{ car.id }}" class="btn btn-sm btn-primary" target="_blank">Просмотр</a>
                     <a href="/admin/cars/{{ car.id }}/edit" class="btn btn-sm btn-warning">Редактировать</a>
                     <form method="post" action="/admin/cars/{{ car.id }}/delete" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту машину?');">
                         <button type="submit" class="btn btn-sm btn-danger">Удалить</button>

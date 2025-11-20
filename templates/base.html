@@ -40,7 +40,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/cars">Каталог</a>
+                        <a class="nav-link" href="/catalog">Каталог</a>
                     </li>
                     {% if current_user %}
                         {% if current_user.role.role_name == "user" %}
@@ -48,10 +48,10 @@
                                 <a class="nav-link" href="/profile">Профиль</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/rentals/my">Мои аренды</a>
+                                <a class="nav-link" href="/account/rentals">Мои аренды</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/violations">Мои нарушения</a>
+                                <a class="nav-link" href="/account/violations">Мои нарушения</a>
                             </li>
                         {% elif current_user.role.role_name == "admin" %}
                             <li class="nav-item">
@@ -69,7 +69,7 @@
                         {% endif %}
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/violation_types">Типы нарушений</a>
+                        <a class="nav-link" href="/info/violation-types">Типы нарушений</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

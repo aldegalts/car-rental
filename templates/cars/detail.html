@@ -17,15 +17,15 @@
             </tr>
             <tr>
                 <th>Категория:</th>
-                <td>{{ car.category.name if car.category else 'Не указана' }}</td>
+                <td>{{ car.category.category_name if car.category else 'Не указана' }}</td>
             </tr>
             <tr>
                 <th>Цвет:</th>
-                <td>{{ car.color.name if car.color else 'Не указан' }}</td>
+                <td>{{ car.color.color if car.color else 'Не указан' }}</td>
             </tr>
             <tr>
                 <th>Статус:</th>
-                <td>{{ car.status.name if car.status else 'Не указан' }}</td>
+                <td>{{ car.status.status if car.status else 'Не указан' }}</td>
             </tr>
             <tr>
                 <th>Стоимость в день:</th>
@@ -37,7 +37,7 @@
         {% elif not current_user %}
         <a href="/login" class="btn btn-success btn-lg">Войти для бронирования</a>
         {% endif %}
-        <a href="/cars" class="btn btn-secondary">Назад к каталогу</a>
+        <a href="/catalog" class="btn btn-secondary">Назад к каталогу</a>
     </div>
 </div>
 {% endblock %}

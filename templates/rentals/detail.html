@@ -26,10 +26,10 @@
             </tr>
             <tr>
                 <th>Статус:</th>
-                <td>{{ rental.status.name if rental.status else 'Не указан' }}</td>
+                <td>{{ rental.status.status if rental.status else 'Не указан' }}</td>
             </tr>
         </table>
-        <a href="/rentals/my" class="btn btn-secondary">Назад к списку</a>
+        <a href="/account/rentals" class="btn btn-secondary">Назад к списку</a>
     </div>
 </div>
 {% endblock %}

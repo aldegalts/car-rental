@@ -30,7 +30,7 @@
             </tr>
             <tr>
                 <th>Статус:</th>
-                <td>{{ rental.status.name if rental.status else 'Не указан' }}</td>
+                <td>{{ rental.status.status if rental.status else 'Не указан' }}</td>
             </tr>
         </table>
         <a href="/admin/rentals/{{ rental.id }}/edit" class="btn btn-warning">Редактировать</a>

@@ -1,53 +1,80 @@
-from fastapi import APIRouter, Depends, Request, Form, Query
+from fastapi import APIRouter, Depends, Request, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
-from decimal import Decimal
 
 from application.frontend.templates import templates
 from application.frontend.utils import get_current_user_async
 from infrastructure.database.database_session import get_db
 import httpx
 
-router = APIRouter(tags=["Frontend Cars"])
+router = APIRouter(tags=["Frontend Cars"], include_in_schema=False)
 
 BASE_URL = "http://localhost:8000"
 
 
-@router.get("/cars", response_class=HTMLResponse)
+@router.get("/catalog", response_class=HTMLResponse)
 async def cars_list(
     request: Request,
     brand: Optional[str] = Query(None),
     model: Optional[str] = Query(None),
-    category_id: Optional[int] = Query(None),
-    color_id: Optional[int] = Query(None),
-    min_year: Optional[int] = Query(None),
-    max_year: Optional[int] = Query(None),
-    min_cost: Optional[float] = Query(None),
-    max_cost: Optional[float] = Query(None),
+    category_id: Optional[str] = Query(None),
+    color_id: Optional[str] = Query(None),
+    min_year: Optional[str] = Query(None),
+    max_year: Optional[str] = Query(None),
+    min_cost: Optional[str] = Query(None),
+    max_cost: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
     """Страница каталога машин"""
     current_user = await get_current_user_async(request, db)
     
     # Получаем фильтры
+    def parse_int(value: Optional[str]) -> Optional[int]:
+        if value is None or value == "":
+            return None
+        try:
+            return int(value)
+        except ValueError:
+            return None
+
+    def parse_float(value: Optional[str]) -> Optional[float]:
+        if value is None or value == "":
+            return None
+        try:
+            return float(value)
+        except ValueError:
+            return None
+
     filters = {}
     if brand:
         filters["brand"] = brand
     if model:
         filters["model"] = model
-    if category_id:
-        filters["category_id"] = category_id
-    if color_id:
-        filters["color_id"] = color_id
-    if min_year:
-        filters["min_year"] = min_year
-    if max_year:
-        filters["max_year"] = max_year
-    if min_cost:
-        filters["min_cost"] = min_cost
-    if max_cost:
-        filters["max_cost"] = max_cost
+
+    category_id_value = parse_int(category_id)
+    if category_id_value is not None:
+        filters["category_id"] = category_id_value
+
+    color_id_value = parse_int(color_id)
+    if color_id_value is not None:
+        filters["color_id"] = color_id_value
+
+    min_year_value = parse_int(min_year)
+    if min_year_value is not None:
+        filters["min_year"] = min_year_value
+
+    max_year_value = parse_int(max_year)
+    if max_year_value is not None:
+        filters["max_year"] = max_year_value
+
+    min_cost_value = parse_float(min_cost)
+    if min_cost_value is not None:
+        filters["min_cost"] = min_cost_value
+
+    max_cost_value = parse_float(max_cost)
+    if max_cost_value is not None:
+        filters["max_cost"] = max_cost_value
     
     cookies = dict(request.cookies)
     
@@ -70,6 +97,17 @@ async def cars_list(
         colors_resp = await client.get(f"{BASE_URL}/car_colors/")
         colors = colors_resp.json() if colors_resp.status_code == 200 else []
     
+    form_state = {
+        "brand": brand or "",
+        "model": model or "",
+        "category_id": category_id_value,
+        "color_id": color_id_value,
+        "min_year": min_year if min_year not in (None, "") else "",
+        "max_year": max_year if max_year not in (None, "") else "",
+        "min_cost": min_cost if min_cost not in (None, "") else "",
+        "max_cost": max_cost if max_cost not in (None, "") else "",
+    }
+
     return templates.TemplateResponse(
         "cars/list.html",
         {
@@ -78,12 +116,13 @@ async def cars_list(
             "cars": cars,
             "categories": categories,
             "colors": colors,
-            "filters": filters
+            "filters": filters,
+            "form_state": form_state,
         }
     )
 
 
-@router.get("/cars/{car_id}", response_class=HTMLResponse)
+@router.get("/catalog/{car_id}", response_class=HTMLResponse)
 async def car_detail(
     request: Request,
     car_id: int,
@@ -97,7 +136,7 @@ async def car_detail(
         response = await client.get(f"{BASE_URL}/cars/{car_id}")
         
         if response.status_code != 200:
-            return RedirectResponse(url="/cars", status_code=302)
+            return RedirectResponse(url="/catalog", status_code=302)
         
         car = response.json()
         

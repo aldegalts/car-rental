@@ -9,12 +9,12 @@ from application.frontend.utils import get_current_user_async
 from infrastructure.database.database_session import get_db
 import httpx
 
-router = APIRouter(tags=["Frontend Rentals"])
+router = APIRouter(tags=["Frontend Rentals"], include_in_schema=False)
 
 BASE_URL = "http://localhost:8000"
 
 
-@router.get("/rentals/my", response_class=HTMLResponse)
+@router.get("/account/rentals", response_class=HTMLResponse)
 async def my_rentals(request: Request, db: Session = Depends(get_db)):
     """Страница моих аренд"""
     current_user = await get_current_user_async(request, db)
@@ -57,7 +57,7 @@ async def my_rentals(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/rentals/{rental_id}", response_class=HTMLResponse)
+@router.get("/account/rentals/{rental_id}", response_class=HTMLResponse)
 async def rental_detail(
     request: Request,
     rental_id: int,
@@ -76,7 +76,7 @@ async def rental_detail(
         
         if response.status_code != 200:
             return RedirectResponse(
-                url="/rentals/my" if current_user.role.role_name == "user" else "/admin/rentals",
+                url="/account/rentals" if current_user.role.role_name == "user" else "/admin/rentals",
                 status_code=302
             )
         
@@ -127,7 +127,7 @@ async def create_rental_page(
         # Получаем данные машины
         car_resp = await client.get(f"{BASE_URL}/cars/{car_id}")
         if car_resp.status_code != 200:
-            return RedirectResponse(url="/cars", status_code=302)
+            return RedirectResponse(url="/catalog", status_code=302)
         
         car = car_resp.json()
         
@@ -175,7 +175,7 @@ async def create_rental_submit(
         # Получаем данные машины для расчета стоимости
         car_resp = await client.get(f"{BASE_URL}/cars/{car_id}")
         if car_resp.status_code != 200:
-            return RedirectResponse(url="/cars", status_code=302)
+            return RedirectResponse(url="/catalog", status_code=302)
         
         car = car_resp.json()
         
@@ -198,7 +198,7 @@ async def create_rental_submit(
         
         if response.status_code == 201:
             rental = response.json()
-            return RedirectResponse(url=f"/rentals/{rental['id']}", status_code=302)
+            return RedirectResponse(url=f"/account/rentals/{rental['id']}", status_code=302)
         else:
             error = response.json().get("detail", "Ошибка при создании аренды")
             return templates.TemplateResponse(

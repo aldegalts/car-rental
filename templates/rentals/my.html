@@ -26,9 +26,9 @@
                 <td>{{ rental.start_date }}</td>
                 <td>{{ rental.end_date }}</td>
                 <td>{{ rental.total_amount }} ₽</td>
-                <td>{{ rental.status.name if rental.status else 'Не указан' }}</td>
+                <td>{{ rental.status.status if rental.status else 'Не указан' }}</td>
                 <td>
-                    <a href="/rentals/{{ rental.id }}" class="btn btn-sm btn-primary">Подробнее</a>
+                    <a href="/account/rentals/{{ rental.id }}" class="btn btn-sm btn-primary">Подробнее</a>
                 </td>
             </tr>
             {% endfor %}
@@ -38,7 +38,7 @@
 {% else %}
 <div class="alert alert-info">
     <p>У вас пока нет аренд.</p>
-    <a href="/cars" class="btn btn-primary">Посмотреть каталог</a>
+    <a href="/catalog" class="btn btn-primary">Посмотреть каталог</a>
 </div>
 {% endif %}
 {% endblock %}
