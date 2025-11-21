@@ -14,7 +14,6 @@ BASE_URL = "http://localhost:8000"
 
 @router.get("/account/violations", response_class=HTMLResponse)
 async def my_violations(request: Request, db: Session = Depends(get_db)):
-    """Страница моих нарушений"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -30,11 +29,9 @@ async def my_violations(request: Request, db: Session = Depends(get_db)):
         else:
             violations = []
         
-        # Получаем типы нарушений
         types_resp = await client.get(f"{BASE_URL}/violation_types/")
         types = {t["id"]: t for t in types_resp.json()} if types_resp.status_code == 200 else {}
         
-        # Получаем аренды
         for violation in violations:
             violation["type"] = types.get(violation.get("violation_type_id"), {})
             if violation.get("rental_id"):
@@ -57,7 +54,6 @@ async def violation_detail(
     violation_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница детальной информации о нарушении"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -73,7 +69,6 @@ async def violation_detail(
         
         violation = response.json()
         
-        # Получаем дополнительные данные
         types_resp = await client.get(f"{BASE_URL}/violation_types/")
         types = {t["id"]: t for t in types_resp.json()} if types_resp.status_code == 200 else {}
         
@@ -95,7 +90,6 @@ async def violation_detail(
 
 @router.get("/info/violation-types", response_class=HTMLResponse)
 async def violation_types_list(request: Request, db: Session = Depends(get_db)):
-    """Страница списка типов нарушений (доступна всем)"""
     current_user = await get_current_user_async(request, db)
     
     async with httpx.AsyncClient(follow_redirects=False) as client:

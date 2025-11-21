@@ -22,7 +22,7 @@ def get_all_rentals(
         db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can view all rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только админ может просматривать все аренды")
 
     filters = RentalFilter(
         car_id=car_id,
@@ -62,11 +62,11 @@ def add_rental(
     except HTTPException as exc:
         if exc.status_code == status.HTTP_404_NOT_FOUND:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail="Only authorized user with client data can rental cars")
+                                detail="Только авторизованный пользователь может арендовать авто")
         raise
 
     if current_user.role.role_name != "user":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user with client data can rental cars")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только пользователь с заполненными данными о себе может арендовать авто")
 
     return CreateRentalUseCase(db).execute(rental_data)
 
@@ -78,7 +78,7 @@ def delete_rental(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалить аренду")
 
     DeleteRentalUseCase(db).execute(rental_id)
     return {"detail": "Rental deleted successfully"}
@@ -91,6 +91,6 @@ def update_rental(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменить аренду")
 
     return UpdateRentalUseCase(db).execute(rental_data)

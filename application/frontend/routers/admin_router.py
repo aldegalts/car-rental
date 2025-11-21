@@ -16,28 +16,24 @@ BASE_URL = "http://localhost:8000"
 
 
 def check_admin(current_user):
-    """Проверка прав администратора"""
     if not current_user or current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
 
 
 @router.get("/admin/dashboard", response_class=HTMLResponse)
 async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
-    """Главная страница администратора"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
     cookies = dict(request.cookies)
     
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
-        # Получаем статистику
         stats_resp = await client.get(f"{BASE_URL}/cars/")
         cars_count = len(stats_resp.json()) if stats_resp.status_code == 200 else 0
         
         clients_resp = await client.get(f"{BASE_URL}/clients/")
         clients_count = len(clients_resp.json()) if clients_resp.status_code == 200 else 0
-        
-        # Для получения всех аренд не передаем параметры - FastAPI создаст пустой RentalFilter
+
         rentals_resp = await client.get(f"{BASE_URL}/rentals/")
         rentals_count = len(rentals_resp.json()) if rentals_resp.status_code == 200 else 0
     
@@ -55,10 +51,8 @@ async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
     )
 
 
-# ========== КЛИЕНТЫ ==========
 @router.get("/admin/clients", response_class=HTMLResponse)
 async def admin_clients(request: Request, db: Session = Depends(get_db)):
-    """Список клиентов"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -84,7 +78,6 @@ async def admin_client_detail(
     client_id: int,
     db: Session = Depends(get_db)
 ):
-    """Детали клиента"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -113,7 +106,6 @@ async def admin_client_edit_page(
     client_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница редактирования клиента"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -149,7 +141,6 @@ async def admin_client_edit_submit(
     license_expiry_date: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы редактирования клиента"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -168,7 +159,6 @@ async def admin_client_edit_submit(
     }
     
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
-        # Сначала получаем существующего клиента для user_id
         get_resp = await client.get(f"{BASE_URL}/clients/{client_id}")
         if get_resp.status_code == 200:
             existing = get_resp.json()
@@ -191,7 +181,6 @@ async def admin_client_edit_submit(
             )
 
 
-# ========== АРЕНДЫ ==========
 @router.get("/admin/rentals", response_class=HTMLResponse)
 async def admin_rentals(
     request: Request,
@@ -199,15 +188,13 @@ async def admin_rentals(
     client_id: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
-    """Список аренд с фильтрацией"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
     cookies = dict(request.cookies)
     filters = {}
     params = {}
-    
-    # Обрабатываем пустые строки как None и конвертируем в int
+
     def parse_int_or_none(value: Optional[str]) -> Optional[int]:
         if value is None or value == "":
             return None
@@ -227,14 +214,12 @@ async def admin_rentals(
         params["client_id"] = client_id_int
     
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
-        # Если есть фильтры, передаем их, иначе не передаем params вообще
         if params:
             response = await client.get(f"{BASE_URL}/rentals/", params=params)
         else:
             response = await client.get(f"{BASE_URL}/rentals/")
         rentals = response.json() if response.status_code == 200 else []
-        
-        # Получаем дополнительные данные
+
         status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
         statuses = {s["id"]: s for s in status_resp.json()} if status_resp.status_code == 200 else {}
         
@@ -268,7 +253,6 @@ async def admin_rental_detail(
     rental_id: int,
     db: Session = Depends(get_db)
 ):
-    """Детали аренды"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -280,8 +264,7 @@ async def admin_rental_detail(
             return RedirectResponse(url="/admin/rentals", status_code=302)
         
         rental = response.json()
-        
-        # Получаем дополнительные данные
+
         status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
         statuses = {s["id"]: s for s in status_resp.json()} if status_resp.status_code == 200 else {}
         
@@ -311,7 +294,6 @@ async def admin_rental_edit_page(
     rental_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница редактирования аренды"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -323,8 +305,7 @@ async def admin_rental_edit_page(
             return RedirectResponse(url="/admin/rentals", status_code=302)
         
         rental = response.json()
-        
-        # Получаем списки для выбора
+
         status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
         statuses = status_resp.json() if status_resp.status_code == 200 else []
         
@@ -359,7 +340,6 @@ async def admin_rental_edit_submit(
     rental_status_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы редактирования аренды"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -382,7 +362,6 @@ async def admin_rental_edit_submit(
             return RedirectResponse(url=f"/admin/rentals/{rental_id}", status_code=302)
         else:
             error = response.json().get("detail", "Ошибка при обновлении")
-            # Получаем данные для повторного отображения формы
             status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
             statuses = status_resp.json() if status_resp.status_code == 200 else []
             cars_resp = await client.get(f"{BASE_URL}/cars/")
@@ -410,7 +389,6 @@ async def admin_rental_delete(
     rental_id: int,
     db: Session = Depends(get_db)
 ):
-    """Удаление аренды"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -422,7 +400,6 @@ async def admin_rental_delete(
     return RedirectResponse(url="/admin/rentals", status_code=302)
 
 
-# ========== СТАТИСТИКА ==========
 @router.get("/admin/statistics", response_class=HTMLResponse)
 async def admin_statistics(
     request: Request,
@@ -430,7 +407,6 @@ async def admin_statistics(
     end_date: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
-    """Страница статистики"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -438,17 +414,13 @@ async def admin_statistics(
     stats = None
     
     if start_date and end_date:
-        # Конвертируем datetime-local формат в ISO формат для API
-        # datetime-local: "2025-11-20T10:00" -> ISO: "2025-11-20T10:00:00"
         try:
-            # Если дата уже в правильном формате, оставляем как есть
-            # Иначе добавляем секунды если их нет
-            if len(start_date) == 16:  # "YYYY-MM-DDTHH:mm"
+            if len(start_date) == 16:
                 start_date_iso = start_date + ":00"
             else:
                 start_date_iso = start_date
             
-            if len(end_date) == 16:  # "YYYY-MM-DDTHH:mm"
+            if len(end_date) == 16:
                 end_date_iso = end_date + ":00"
             else:
                 end_date_iso = end_date

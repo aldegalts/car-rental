@@ -40,7 +40,7 @@ def add_violation(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create violations")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может добавлять нарушения")
 
     return CreateViolationUseCase(db).execute(violation_data)
 
@@ -52,7 +52,7 @@ def delete_violation(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete violations")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалять нарушения")
 
     DeleteViolationUseCase(db).execute(violation_id)
     return {"detail": "Violation deleted successfully"}
@@ -65,6 +65,6 @@ def update_violation(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update violations")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменять нарушения")
 
     return UpdateViolationUseCase(db).execute(violation_data)

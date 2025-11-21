@@ -27,7 +27,7 @@ def add_violation_type(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create violation types")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может добавлять типы нарушений")
 
     return CreateViolationTypeUseCase(db).execute(type_data)
 
@@ -39,7 +39,7 @@ def delete_violation_type(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete violation types")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалять нарушения")
 
     DeleteViolationTypeUseCase(db).execute(type_id)
     return {"detail": "Violation type deleted successfully"}
@@ -52,6 +52,6 @@ def update_violation_type(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update violation types")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменять нарушения")
 
     return UpdateViolationTypeUseCase(db).execute(type_data)

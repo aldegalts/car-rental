@@ -62,7 +62,7 @@ def add_car(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create cars")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может добавлять машины")
 
     return CreateCarUseCase(db).execute(car_data)
 
@@ -74,7 +74,7 @@ def delete_car(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete cars")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалять машины")
 
     DeleteCarUseCase(db).execute(car_id)
     return {"detail": "Car deleted successfully"}
@@ -87,6 +87,6 @@ def update_car(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update cars")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменять машины")
 
     return UpdateCarUseCase(db).execute(car_data)

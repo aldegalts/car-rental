@@ -15,15 +15,12 @@ BASE_URL = "http://localhost:8000"
 
 
 def check_admin(current_user):
-    """Проверка прав администратора"""
     if not current_user or current_user.role.role_name != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
 
 
-# ========== МАШИНЫ ==========
 @router.get("/admin/cars", response_class=HTMLResponse)
 async def admin_cars(request: Request, db: Session = Depends(get_db)):
-    """Список машин для администратора"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -60,7 +57,6 @@ async def admin_cars(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/admin/cars/create", response_class=HTMLResponse)
 async def admin_car_create_page(request: Request, db: Session = Depends(get_db)):
-    """Страница создания машины"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -101,7 +97,6 @@ async def admin_car_create_submit(
     car_status_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы создания машины"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -126,7 +121,6 @@ async def admin_car_create_submit(
             return RedirectResponse(url=f"/admin/cars", status_code=302)
         else:
             error = response.json().get("detail", "Ошибка при создании")
-            # Получаем данные для повторного отображения формы
             categories_resp = await client.get(f"{BASE_URL}/car_categories/")
             categories = categories_resp.json() if categories_resp.status_code == 200 else []
             colors_resp = await client.get(f"{BASE_URL}/car_colors/")
@@ -153,7 +147,6 @@ async def admin_car_edit_page(
     car_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница редактирования машины"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -202,7 +195,6 @@ async def admin_car_edit_submit(
     car_status_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы редактирования машины"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     
@@ -254,7 +246,6 @@ async def admin_car_delete(
     car_id: int,
     db: Session = Depends(get_db)
 ):
-    """Удаление машины"""
     current_user = await get_current_user_async(request, db)
     check_admin(current_user)
     

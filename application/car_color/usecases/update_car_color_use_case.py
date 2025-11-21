@@ -13,7 +13,7 @@ class UpdateCarColorUseCase:
     def execute(self, color_data: CarColorUpdate) -> CarColorRead:
         color = self.car_color_repo.get_by_id(color_data.id)
         if color is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Color not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Цвет не найден")
 
         color_res = self.car_color_repo.update(color_data.id, color_data.color, color_data.hex)
 

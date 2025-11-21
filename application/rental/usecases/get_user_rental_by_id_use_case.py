@@ -11,7 +11,6 @@ class GetUserRentalByIdUseCase:
         self.rental_repo = RentalRepository(db)
 
     def execute(self, current_user_id: int, rental_id: int) -> RentalRead:
-        # Автоматически завершаем истекшие аренды перед получением
         CompleteExpiredRentalsUseCase(self.db).execute()
         
         rental = self.rental_repo.get_by_user_and_id(current_user_id, rental_id)

@@ -13,7 +13,7 @@ class UpdateViolationTypeUseCase:
     def execute(self, type_data: ViolationTypeUpdate) -> ViolationTypeRead:
         v_type = self.violation_type_repo.get_by_id(type_data.id)
         if v_type is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Тип нарушения не найден")
 
         v_type_res = self.violation_type_repo.update(
             type_id=type_data.id,

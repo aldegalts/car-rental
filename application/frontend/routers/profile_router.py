@@ -15,7 +15,6 @@ BASE_URL = "http://localhost:8000"
 
 @router.get("/profile", response_class=HTMLResponse)
 async def profile_page(request: Request, db: Session = Depends(get_db)):
-    """Страница профиля пользователя"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -26,14 +25,12 @@ async def profile_page(request: Request, db: Session = Depends(get_db)):
     
     cookies = dict(request.cookies)
     
-    # Получаем данные клиента
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
         response = await client.get(f"{BASE_URL}/clients/profile")
         
         if response.status_code == 200:
             client_data = response.json()
         elif response.status_code == 404:
-            # Клиент не создан, нужно заполнить данные
             return RedirectResponse(url="/profile/fill", status_code=302)
         else:
             client_data = None
@@ -50,7 +47,6 @@ async def profile_page(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/profile/fill", response_class=HTMLResponse)
 async def fill_profile_page(request: Request, db: Session = Depends(get_db)):
-    """Страница заполнения данных профиля"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -80,7 +76,6 @@ async def fill_profile_submit(
     license_expiry_date: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы заполнения профиля"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -88,7 +83,6 @@ async def fill_profile_submit(
     
     cookies = dict(request.cookies)
     
-    # Создаем данные клиента
     client_data = {
         "name": name,
         "surname": surname,

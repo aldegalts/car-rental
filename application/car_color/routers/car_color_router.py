@@ -27,7 +27,7 @@ def add_color(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can create car colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может добавлять цвета машин")
 
     return CreateCarColorUseCase(db).execute(color_data)
 
@@ -39,7 +39,7 @@ def delete_color(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete car colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалять цвета машин")
 
     DeleteCarColorUseCase(db).execute(color_id)
     return {"detail": "Color deleted successfully"}
@@ -52,6 +52,6 @@ def update_color(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update car colors")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может обновлять цвета машин")
 
     return UpdateCarColorUseCase(db).execute(color_data)

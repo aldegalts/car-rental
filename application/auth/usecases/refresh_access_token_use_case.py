@@ -17,7 +17,7 @@ class RefreshAccessTokenUseCase:
         if not payload or not is_refresh_token(payload):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired refresh token",
+                detail="Недействительный или истекший токен обновления",
             )
 
         user_id = payload.get("sub")
@@ -25,7 +25,7 @@ class RefreshAccessTokenUseCase:
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found")
+                detail="Пользователь не найден")
 
         new_access_token = create_access_token(
             {"sub": str(user.id), "role": user.role.role_name}

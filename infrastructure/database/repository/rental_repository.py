@@ -82,7 +82,6 @@ class RentalRepository:
         return rental_obj
 
     def get_expired_active_rentals(self, active_status_id: int) -> List[RentalEntity]:
-        """Получить активные аренды, у которых истек срок"""
         now = datetime.now()
         return (
             self.session.query(RentalEntity)
@@ -94,7 +93,6 @@ class RentalRepository:
         )
 
     def update_status(self, rental_id: int, rental_status_id: int) -> RentalEntity:
-        """Обновить только статус аренды"""
         rental_obj = self.session.get(RentalEntity, rental_id)
         rental_obj.rental_status_id = rental_status_id
         self.session.commit()

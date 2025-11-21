@@ -13,7 +13,6 @@ class GetAllRentalsUseCase:
         self.rental_repo = RentalRepository(db)
 
     def execute(self, filters: RentalFilter) -> List[RentalRead]:
-        # Автоматически завершаем истекшие аренды перед получением списка
         CompleteExpiredRentalsUseCase(self.db).execute()
         
         rentals = self.rental_repo.filter(

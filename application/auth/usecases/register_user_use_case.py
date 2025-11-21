@@ -18,14 +18,14 @@ class RegisterUserUseCase:
         if self.user_repo.get_by_username(user_data.username):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already registered"
+                detail="Имя пользователя занято"
             )
 
         user_role = self.role_repo.get_by_role_name("user")
         if not user_role:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Default role 'user' not found in database"
+                detail="Роль по умолчанию 'user' не найдена в базе"
             )
 
         hashed_password = get_password_hash(user_data.password)

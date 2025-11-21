@@ -26,10 +26,8 @@ async def cars_list(
     max_cost: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
-    """Страница каталога машин"""
     current_user = await get_current_user_async(request, db)
-    
-    # Получаем фильтры
+
     def parse_int(value: Optional[str]) -> Optional[int]:
         if value is None or value == "":
             return None
@@ -77,8 +75,7 @@ async def cars_list(
         filters["max_cost"] = max_cost_value
     
     cookies = dict(request.cookies)
-    
-    # Получаем список машин
+
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
         if filters:
             response = await client.get(f"{BASE_URL}/cars/filter", params=filters)
@@ -89,8 +86,7 @@ async def cars_list(
             cars = response.json()
         else:
             cars = []
-        
-        # Получаем категории, цвета и статусы для фильтров
+
         categories_resp = await client.get(f"{BASE_URL}/car_categories/")
         categories = categories_resp.json() if categories_resp.status_code == 200 else []
         
@@ -128,7 +124,6 @@ async def car_detail(
     car_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница детальной информации о машине"""
     current_user = await get_current_user_async(request, db)
     cookies = dict(request.cookies)
     
@@ -139,8 +134,7 @@ async def car_detail(
             return RedirectResponse(url="/catalog", status_code=302)
         
         car = response.json()
-        
-        # Получаем категорию, цвет и статус
+
         category_resp = await client.get(f"{BASE_URL}/car_categories/")
         categories = {c["id"]: c for c in category_resp.json()} if category_resp.status_code == 200 else {}
         

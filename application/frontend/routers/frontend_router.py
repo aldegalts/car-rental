@@ -19,7 +19,6 @@ BASE_URL = "http://localhost:8000"
 
 
 async def make_api_request(method: str, url: str, data: dict = None, cookies: dict = None):
-    """Вспомогательная функция для API запросов"""
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
         if method == "GET":
             response = await client.get(url, params=data)
@@ -34,13 +33,11 @@ async def make_api_request(method: str, url: str, data: dict = None, cookies: di
 
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    """Главная страница - редирект на каталог"""
     return RedirectResponse(url="/catalog", status_code=302)
 
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, db: Session = Depends(get_db)):
-    """Страница входа"""
     current_user = await get_current_user_async(request, db)
     if current_user:
         if current_user.role.role_name == "admin":
@@ -58,7 +55,6 @@ async def login_submit(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы входа"""
     from fastapi import Response as FastAPIResponse
     from application.auth.schemas import UserLogin
     from application.auth.usecases import LoginUserUseCase
@@ -67,35 +63,27 @@ async def login_submit(
     try:
         login_data = UserLogin(username=username, password=password)
         login_use_case = LoginUserUseCase(db)
-        
-        # Создаем Response для установки cookies
+
         temp_response = FastAPIResponse()
         user_data = login_use_case.login_user(login_data, temp_response)
-        
-        # Создаем редирект с cookies
+
         redirect_response = RedirectResponse(
             url="/profile" if user_data.role == "user" else "/admin/dashboard",
             status_code=302
         )
-        
-        # Получаем cookies напрямую из use case
-        # Используем те же параметры, что и в use case
+
         ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
         REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
-        
-        # Получаем cookies из заголовков ответа
-        # FastAPI Response хранит cookies в response.headers
+
         if hasattr(temp_response, 'headers'):
             set_cookie_values = temp_response.headers.getlist("set-cookie")
             for cookie_str in set_cookie_values:
-                # Парсим cookie: "name=value; Path=/; HttpOnly"
                 cookie_parts = cookie_str.split(";")
                 name_value = cookie_parts[0].split("=", 1)
                 if len(name_value) == 2:
                     cookie_name = name_value[0].strip()
                     cookie_value = name_value[1].strip()
                     
-                    # Определяем max_age на основе имени cookie
                     if cookie_name == "access_token":
                         max_age = ACCESS_TOKEN_EXPIRE_MINUTES * 60
                     elif cookie_name == "refresh_token":
@@ -111,9 +99,7 @@ async def login_submit(
                         path="/"
                     )
         
-        # Альтернативный способ: получаем токены напрямую из use case
-        # Но для этого нужно изменить use case, поэтому используем заголовки
-        # Если заголовки не работают, создаем токены вручную
+
         if not hasattr(temp_response, 'headers') or not temp_response.headers.getlist("set-cookie"):
             from application.auth.utils.jwt import create_access_token, create_refresh_token
             from datetime import timedelta
@@ -124,7 +110,6 @@ async def login_submit(
             access_token = create_access_token(payload, access_expires)
             refresh_token_value, expires_at = create_refresh_token(payload)
             
-            # Сохраняем refresh token в БД
             from infrastructure.database.models import RefreshTokenEntity
             refresh_token_repo = RefreshTokenRepository(db)
             refresh_token_entity = RefreshTokenEntity(
@@ -134,7 +119,6 @@ async def login_submit(
             )
             refresh_token_repo.add(refresh_token_entity)
             
-            # Устанавливаем cookies
             redirect_response.set_cookie(
                 key="access_token",
                 value=access_token,
@@ -165,7 +149,6 @@ async def login_submit(
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request, db: Session = Depends(get_db)):
-    """Страница регистрации"""
     current_user = await get_current_user_async(request, db)
     if current_user:
         return RedirectResponse(url="/profile", status_code=302)
@@ -179,7 +162,6 @@ async def register_submit(
     username: str = Form(...),
     password: str = Form(...)
 ):
-    """Обработка формы регистрации"""
     try:
         async with httpx.AsyncClient(follow_redirects=False) as client:
             response = await client.post(
@@ -204,7 +186,6 @@ async def register_submit(
 
 @router.post("/logout", response_class=HTMLResponse)
 async def logout(request: Request):
-    """Выход из аккаунта"""
     cookies = dict(request.cookies)
     try:
         async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:

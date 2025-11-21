@@ -21,15 +21,13 @@ def get_rental_stats(
     if current_user.role.role_name != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admin can view rental statistics"
+            detail="Только администратор может просматривать статистику"
         )
 
-    # Парсим строки в datetime объекты
     try:
-        # Поддерживаем разные форматы: "YYYY-MM-DDTHH:mm" и "YYYY-MM-DDTHH:mm:ss"
-        if len(start_date) == 16:  # "YYYY-MM-DDTHH:mm"
+        if len(start_date) == 16:
             start_date = start_date + ":00"
-        if len(end_date) == 16:  # "YYYY-MM-DDTHH:mm"
+        if len(end_date) == 16:
             end_date = end_date + ":00"
         
         start_dt = datetime.fromisoformat(start_date)
@@ -37,7 +35,7 @@ def get_rental_stats(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid date format: {str(e)}"
+            detail=f"Неправильный формат даты: {str(e)}"
         )
 
     return RentalStatisticUseCase(db).execute(start_dt, end_dt)

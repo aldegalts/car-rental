@@ -13,7 +13,9 @@ class GetClientByUserIdUseCase:
     def execute(self, user_id: int) -> ClientRead:
         client = self.client_repo.get_by_user_id(user_id)
         if client is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Клиент не найден")
 
         return ClientRead.model_validate(client)
+
+
 

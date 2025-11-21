@@ -24,11 +24,11 @@ class CreateRentalUseCase:
     def execute(self, rental_data: RentalCreate) -> RentalRead:
         car = self.car_repo.get_by_id(rental_data.car_id)
         if car is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Машина не найдена")
 
         current_car_status = getattr(car.car_status, "status", None)
         if current_car_status and current_car_status.lower() == self.RENTED_CAR_STATUS.lower():
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="The car is not available for rent")
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Машина недоступна для аренды")
 
         rental_status_id = rental_data.rental_status_id
         if rental_status_id is None:

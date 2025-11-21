@@ -16,7 +16,6 @@ BASE_URL = "http://localhost:8000"
 
 @router.get("/account/rentals", response_class=HTMLResponse)
 async def my_rentals(request: Request, db: Session = Depends(get_db)):
-    """Страница моих аренд"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -35,11 +34,9 @@ async def my_rentals(request: Request, db: Session = Depends(get_db)):
         else:
             rentals = []
         
-        # Получаем статусы аренд
         status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
         statuses = {s["id"]: s for s in status_resp.json()} if status_resp.status_code == 200 else {}
         
-        # Получаем машины
         cars_resp = await client.get(f"{BASE_URL}/cars/")
         cars = {c["id"]: c for c in cars_resp.json()} if cars_resp.status_code == 200 else {}
         
@@ -63,7 +60,6 @@ async def rental_detail(
     rental_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница детальной информации об аренде"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -82,7 +78,6 @@ async def rental_detail(
         
         rental = response.json()
         
-        # Получаем дополнительные данные
         status_resp = await client.get(f"{BASE_URL}/rental_statuses/")
         statuses = {s["id"]: s for s in status_resp.json()} if status_resp.status_code == 200 else {}
         
@@ -108,7 +103,6 @@ async def create_rental_page(
     car_id: int,
     db: Session = Depends(get_db)
 ):
-    """Страница создания аренды"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -116,7 +110,6 @@ async def create_rental_page(
     
     cookies = dict(request.cookies)
     
-    # Проверяем наличие данных клиента
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
         client_resp = await client.get(f"{BASE_URL}/clients/profile")
         if client_resp.status_code != 200:
@@ -124,7 +117,6 @@ async def create_rental_page(
         
         client_data = client_resp.json()
         
-        # Получаем данные машины
         car_resp = await client.get(f"{BASE_URL}/cars/{car_id}")
         if car_resp.status_code != 200:
             return RedirectResponse(url="/catalog", status_code=302)
@@ -152,7 +144,6 @@ async def create_rental_submit(
     end_date: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Обработка формы создания аренды"""
     current_user = await get_current_user_async(request, db)
     
     if not current_user:
@@ -160,7 +151,6 @@ async def create_rental_submit(
     
     cookies = dict(request.cookies)
     
-    # Получаем данные клиента
     async with httpx.AsyncClient(cookies=cookies, follow_redirects=False) as client:
         client_resp = await client.get(f"{BASE_URL}/clients/profile")
         if client_resp.status_code != 200:
@@ -168,14 +158,12 @@ async def create_rental_submit(
         
         client_data = client_resp.json()
         
-        # Получаем данные машины для расчета стоимости
         car_resp = await client.get(f"{BASE_URL}/cars/{car_id}")
         if car_resp.status_code != 200:
             return RedirectResponse(url="/catalog", status_code=302)
         
         car = car_resp.json()
         
-        # Рассчитываем количество дней и общую стоимость
         start = datetime.now()
         end = datetime.fromisoformat(end_date.replace("T", " "))
 

@@ -13,7 +13,7 @@ class UpdateClientUseCase:
     def execute(self, client_data: ClientUpdate) -> ClientRead:
         client = self.client_repo.get_by_id(client_data.id)
         if client is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Клиент не найден")
 
         client_res = self.client_repo.update(
             client_id=client_data.id,

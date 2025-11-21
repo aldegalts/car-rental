@@ -20,7 +20,7 @@ def get_all_clients(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get all clients")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может получать список всех клиентов")
 
     return GetAllClientsUseCase(db).execute()
 
@@ -31,7 +31,7 @@ def get_profile(
         db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "user":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only user can get his profile")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только пользователь может входить в свой профиль")
 
     return GetClientByUserIdUseCase(db).execute(current_user.id)
 
@@ -43,7 +43,7 @@ def get_client_by_id(
         db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can get client by id")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может получать клиента по id")
 
     return GetClientByIdUseCase(db).execute(client_id)
 
@@ -55,7 +55,7 @@ def add_client(
     db: Session = Depends(get_db)
 ):
     if not current_user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user can add client")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только авторизованные пользователи могут заполнить данные о клиенте")
 
     return CreateClientUseCase(db).execute(client_data)
 
@@ -67,6 +67,6 @@ def update_client(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update clients")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменять данные клиента")
 
     return UpdateClientUseCase(db).execute(client_data)
