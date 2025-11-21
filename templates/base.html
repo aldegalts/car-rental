@@ -58,18 +58,16 @@
                                 <a class="nav-link" href="/admin/dashboard">Панель администратора</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/admin/clients">Клиенты</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/admin/rentals">Аренды</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" href="/admin/statistics">Статистика</a>
+                            </li>
+                        {% elif current_user.role.role_name != "admin" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/info/violation-types">Типы нарушений</a>
                             </li>
                         {% endif %}
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/info/violation-types">Типы нарушений</a>
+                        <a class="nav-link" href="/about">О разработчике</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

@@ -4,7 +4,7 @@
 
 {% block content %}
 <h2>Аренда #{{ rental.id }}</h2>
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title">Информация об аренде</h5>
         <table class="table">
@@ -40,5 +40,150 @@
         <a href="/admin/rentals" class="btn btn-secondary">Назад</a>
     </div>
 </div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Нарушения</h5>
+            <span class="badge bg-secondary">{{ violations|length }}</span>
+        </div>
+        {% if violations %}
+            <div class="table-responsive mt-3">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Тип</th>
+                            <th>Описание</th>
+                            <th>Штраф</th>
+                            <th>Дата</th>
+                            <th>Оплачено</th>
+                            <th class="text-end">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for violation in violations %}
+                        <tr>
+                            <td>{{ violation.id }}</td>
+                            <td>{{ violation.type.type_name if violation.type else '—' }}</td>
+                            <td>{{ violation.description }}</td>
+                            <td>{{ violation.fine_amount }} ₽</td>
+                            <td>{{ violation.violation_date }}</td>
+                            <td>
+                                {% if violation.is_paid %}
+                                    <span class="badge bg-success">Да</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Нет</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="/admin/rentals/{{ rental.id }}/violations/{{ violation.id }}/edit" class="btn btn-sm btn-outline-primary me-2">Изменить</a>
+                                <form method="post" action="/admin/rentals/{{ rental.id }}/violations/{{ violation.id }}/delete" style="display:inline;" onsubmit="return confirm('Удалить нарушение #{{ violation.id }}?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-3 mb-0">
+                По этой аренде пока нет зарегистрированных нарушений.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if violation_types %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Зафиксировать нарушение</h5>
+        <form method="post" action="/admin/rentals/{{ rental.id }}/violations">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="violationTypeSelect" class="form-label">Тип нарушения</label>
+                    <select class="form-select" id="violationTypeSelect" name="violation_type_id" required>
+                        <option value="" disabled {% if not form_data %}selected{% endif %}>Выберите тип</option>
+                        {% for type in violation_types %}
+                            <option value="{{ type.id }}" data-default-fine="{{ type.default_fine }}"
+                                {% if form_data and form_data.violation_type_id|int == type.id %}selected{% endif %}>
+                                {{ type.type_name }} ({{ type.default_fine }} ₽)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="violationDateInput" class="form-label">Дата нарушения</label>
+                    <input type="datetime-local" class="form-control" id="violationDateInput" name="violation_date" required
+                           value="{{ form_data.violation_date if form_data else current_time_iso }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="violationDescription" class="form-label">Описание</label>
+                <textarea class="form-control" id="violationDescription" name="description" rows="3" required>{{ form_data.description if form_data else '' }}</textarea>
+            </div>
+            <div class="row align-items-end">
+                <div class="col-md-4 mb-3">
+                    <label for="fineAmountInput" class="form-label">Сумма штрафа (₽)</label>
+                    <input type="number" min="0" step="0.01" class="form-control" id="fineAmountInput" name="fine_amount" required
+                           value="{{ form_data.fine_amount if form_data else '' }}">
+                </div>
+                <div class="col-md-3 mb-3 form-check mt-4">
+                    <input class="form-check-input" type="checkbox" value="true" id="isPaidCheckbox" name="is_paid"
+                           {% if form_data and form_data.is_paid %}checked{% endif %}>
+                    <label class="form-check-label" for="isPaidCheckbox">
+                        Штраф оплачен
+                    </label>
+                </div>
+                <div class="col-md-5 mb-3 text-md-end">
+                    <button type="submit" class="btn btn-primary">Сохранить нарушение</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    Сначала создайте тип нарушения, чтобы зафиксировать нарушение по аренде.
+    <a href="/admin/violation-types" class="alert-link">Перейти к типам нарушений</a>.
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const typeSelect = document.getElementById("violationTypeSelect");
+    const fineInput = document.getElementById("fineAmountInput");
+    if (!typeSelect || !fineInput) {
+        return;
+    }
+
+    const updateFine = () => {
+        const option = typeSelect.selectedOptions[0];
+        if (!option) {
+            return;
+        }
+        const defaultFine = option.getAttribute("data-default-fine");
+        if (defaultFine && !fineInput.dataset.userEdited) {
+            fineInput.value = defaultFine;
+        }
+    };
+
+    typeSelect.addEventListener("change", () => {
+        fineInput.dataset.userEdited = "";
+        updateFine();
+    });
+
+    fineInput.addEventListener("input", () => {
+        fineInput.dataset.userEdited = "true";
+    });
+
+    if (!fineInput.value) {
+        updateFine();
+    }
+});
+</script>
 {% endblock %}
 

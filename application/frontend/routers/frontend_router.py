@@ -198,3 +198,22 @@ async def logout(request: Request):
     response.delete_cookie("refresh_token")
     return response
 
+
+@router.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request, db: Session = Depends(get_db)):
+    current_user = await get_current_user_async(request, db)
+    return templates.TemplateResponse(
+        "about.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "developer": {
+                "name": "Дегальцева Алина Евгеньевна",
+                "university": "Воронежского государственного университета",
+                "faculty": "Факультет компьютерных наук",
+                "course": "3 курс",
+                "group": "4 группа"
+            }
+        }
+    )
+

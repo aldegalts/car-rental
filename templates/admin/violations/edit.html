@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать нарушение #{{ violation.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Редактирование нарушения</h2>
+        <p class="text-muted mb-0">Аренда #{{ violation.rental_id }}</p>
+    </div>
+    <a href="/admin/rentals/{{ violation.rental_id }}" class="btn btn-secondary">Назад к аренде</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" action="/admin/rentals/{{ violation.rental_id }}/violations/{{ violation.id }}/edit">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="violationTypeSelect" class="form-label">Тип нарушения</label>
+                    <select class="form-select" id="violationTypeSelect" name="violation_type_id" required>
+                        {% for type in violation_types %}
+                            <option value="{{ type.id }}" data-default-fine="{{ type.default_fine }}"
+                                {% if type.id == violation.violation_type_id %}selected{% endif %}>
+                                {{ type.type_name }} ({{ type.default_fine }} ₽)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="violationDateInput" class="form-label">Дата нарушения</label>
+                    <input type="datetime-local" class="form-control" id="violationDateInput" name="violation_date" required
+                           value="{{ violation_date_value }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="violationDescription" class="form-label">Описание</label>
+                <textarea class="form-control" id="violationDescription" name="description" rows="3" required>{{ violation.description }}</textarea>
+            </div>
+
+            <div class="row align-items-end">
+                <div class="col-md-4 mb-3">
+                    <label for="fineAmountInput" class="form-label">Сумма штрафа (₽)</label>
+                    <input type="number" min="0" step="0.01" class="form-control" id="fineAmountInput" name="fine_amount" required
+                           value="{{ violation.fine_amount }}">
+                </div>
+                <div class="col-md-3 mb-3 form-check mt-4">
+                    <input class="form-check-input" type="checkbox" value="true" id="isPaidCheckbox" name="is_paid"
+                           {% if violation.is_paid %}checked{% endif %}>
+                    <label class="form-check-label" for="isPaidCheckbox">
+                        Штраф оплачен
+                    </label>
+                </div>
+                <div class="col-md-5 mb-3 text-md-end">
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const typeSelect = document.getElementById("violationTypeSelect");
+    const fineInput = document.getElementById("fineAmountInput");
+    if (!typeSelect || !fineInput) {
+        return;
+    }
+
+    typeSelect.addEventListener("change", () => {
+        const option = typeSelect.selectedOptions[0];
+        if (!option) {
+            return;
+        }
+        const defaultFine = option.getAttribute("data-default-fine");
+        if (defaultFine) {
+            fineInput.value = defaultFine;
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
