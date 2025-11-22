@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика - Панель администратора{% endblock %}
+
+{% block content %}
+<h2>Статистика аренд</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Период</h5>
+        <form method="get" action="/admin/statistics" class="row g-3">
+            <div class="col-md-4">
+                <label for="start_date" class="form-label">Дата начала</label>
+                <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ start_date or '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label for="end_date" class="form-label">Дата окончания</label>
+                <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ end_date or '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary">Получить статистику</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% if stats %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Всего аренд</h5>
+                <h2>{{ stats.total_rentals }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Без нарушений</h5>
+                <h2>{{ stats.percent_without_violations }}%</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">С нарушениями</h5>
+                <h2>{{ stats.percent_with_violations }}%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% if stats.rentals %}
+<div class="mt-4">
+    <h3>Список аренд</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Дата начала</th>
+                    <th>Дата окончания</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in stats.rentals %}
+                <tr>
+                    <td>{{ rental.id }}</td>
+                    <td>{{ rental.start_date }}</td>
+                    <td>{{ rental.end_date }}</td>
+                    <td>{{ rental.total_amount }} ₽</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
+

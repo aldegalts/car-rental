@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<h2>Мой профиль</h2>
+{% if client %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ client.name }} {{ client.surname }}</h5>
+        <table class="table">
+            <tr>
+                <th>Имя:</th>
+                <td>{{ client.name }}</td>
+            </tr>
+            <tr>
+                <th>Фамилия:</th>
+                <td>{{ client.surname }}</td>
+            </tr>
+            <tr>
+                <th>Дата рождения:</th>
+                <td>{{ client.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>Телефон:</th>
+                <td>{{ client.phone }}</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ client.email }}</td>
+            </tr>
+            <tr>
+                <th>Водительские права:</th>
+                <td>{{ client.driver_license }}</td>
+            </tr>
+            <tr>
+                <th>Срок действия прав:</th>
+                <td>{{ client.license_expiry_date }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <p>Данные профиля не заполнены. Пожалуйста, заполните их для возможности аренды автомобилей.</p>
+    <a href="/profile/fill" class="btn btn-primary">Заполнить данные</a>
+</div>
+{% endif %}
+{% endblock %}
+

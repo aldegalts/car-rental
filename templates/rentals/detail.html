@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Аренда #{{ rental.id }} - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<h2>Аренда #{{ rental.id }}</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Информация об аренде</h5>
+        <table class="table">
+            <tr>
+                <th>Машина:</th>
+                <td>{{ rental.car.brand }} {{ rental.car.model }} ({{ rental.car.license_plate }})</td>
+            </tr>
+            <tr>
+                <th>Дата начала:</th>
+                <td>{{ rental.start_date }}</td>
+            </tr>
+            <tr>
+                <th>Дата окончания:</th>
+                <td>{{ rental.end_date }}</td>
+            </tr>
+            <tr>
+                <th>Общая сумма:</th>
+                <td><strong>{{ rental.total_amount }} ₽</strong></td>
+            </tr>
+            <tr>
+                <th>Статус:</th>
+                <td>{{ rental.status.status if rental.status else 'Не указан' }}</td>
+            </tr>
+        </table>
+        <a href="/account/rentals" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,1 @@
+from .rental_statistic_use_case import RentalStatisticUseCase

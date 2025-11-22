@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ car.brand }} {{ car.model }} - Аренда автомобилей{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>{{ car.brand }} {{ car.model }}</h2>
+        <table class="table">
+            <tr>
+                <th>Год выпуска:</th>
+                <td>{{ car.year }}</td>
+            </tr>
+            <tr>
+                <th>Гос. номер:</th>
+                <td>{{ car.license_plate }}</td>
+            </tr>
+            <tr>
+                <th>Категория:</th>
+                <td>{{ car.category.category_name if car.category else 'Не указана' }}</td>
+            </tr>
+            <tr>
+                <th>Цвет:</th>
+                <td>{{ car.color.color if car.color else 'Не указан' }}</td>
+            </tr>
+            <tr>
+                <th>Статус:</th>
+                <td>{{ car.status.status if car.status else 'Не указан' }}</td>
+            </tr>
+            <tr>
+                <th>Стоимость в день:</th>
+                <td><strong>{{ car.daily_cost }} ₽</strong></td>
+            </tr>
+        </table>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            {% if current_user and current_user.role.role_name == "user" %}
+            <a href="/rentals/create/{{ car.id }}" class="btn btn-success btn-lg flex-fill">Арендовать</a>
+            {% elif not current_user %}
+            <a href="/login" class="btn btn-success btn-lg flex-fill">Войти для аренды</a>
+            {% endif %}
+            <a href="/catalog" class="btn btn-secondary btn-lg flex-fill">Назад к каталогу</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
