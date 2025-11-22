@@ -5,8 +5,13 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class ViolationTypeBase(BaseModel):
     type_name: str = Field(..., examples=["Нарушение правил дорожного движения"])
-    daily_cost: Decimal = Field(..., examples=["500.00"])
-    description: str = Field(..., examples=["Включает в себя оплату административного сбора компании за обработку штрафа и оплату штрафа за нарушение ПДД (например, превышение скорости или проезд на красный свет)."])
+    default_fine: Decimal = Field(..., examples=["500.00"])
+    description: str = Field(
+        ...,
+        examples=[
+            "Включает в себя оплату административного сбора компании за обработку штрафа и оплату штрафа за нарушение ПДД (например, превышение скорости или проезд на красный свет)."
+        ],
+    )
 
 
 class ViolationTypeCreate(ViolationTypeBase):

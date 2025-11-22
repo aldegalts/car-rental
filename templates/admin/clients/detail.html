@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Клиент #{{ client.id }} - Панель администратора{% endblock %}
+
+{% block content %}
+<h2>Клиент #{{ client.id }}</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ client.name }} {{ client.surname }}</h5>
+        <table class="table">
+            <tr>
+                <th>Имя:</th>
+                <td>{{ client.name }}</td>
+            </tr>
+            <tr>
+                <th>Фамилия:</th>
+                <td>{{ client.surname }}</td>
+            </tr>
+            <tr>
+                <th>Дата рождения:</th>
+                <td>{{ client.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>Телефон:</th>
+                <td>{{ client.phone }}</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ client.email }}</td>
+            </tr>
+            <tr>
+                <th>Водительские права:</th>
+                <td>{{ client.driver_license }}</td>
+            </tr>
+            <tr>
+                <th>Дата выдачи прав:</th>
+                <td>{{ client.license_expiry_date }}</td>
+            </tr>
+        </table>
+        <a href="/admin/clients/{{ client.id }}/edit" class="btn btn-warning">Редактировать</a>
+        <a href="/admin/clients" class="btn btn-secondary">Назад</a>
+    </div>
+</div>
+{% endblock %}
+

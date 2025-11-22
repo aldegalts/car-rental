@@ -25,7 +25,7 @@ class LoginUserUseCase:
         if not user or not verify_password(login_data.password, user.password_hash):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid username or password",
+                detail="Неправильное имя пользователя или пароль",
             )
 
         access_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

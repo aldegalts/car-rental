@@ -11,11 +11,11 @@ class ClientBase(BaseModel):
     email: str
     driver_license: str
     license_expiry_date: date
-    user_id: id
+    user_id: int
 
 
 class ClientCreate(ClientBase):
-    id: int
+    pass
 
 
 class ClientUpdate(ClientBase):

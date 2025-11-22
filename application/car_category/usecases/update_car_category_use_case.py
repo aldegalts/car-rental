@@ -13,7 +13,7 @@ class UpdateCarCategoryUseCase:
     def execute(self, category_data: CarCategoryUpdate) -> CarCategoryRead:
         car_category = self.car_category_repo.get_by_id(category_data.id)
         if car_category is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Статус не найден")
 
         category_res = self.car_category_repo.update(
             category_id=category_data.id,

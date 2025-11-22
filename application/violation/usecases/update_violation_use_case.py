@@ -13,7 +13,7 @@ class UpdateViolationUseCase:
     def execute(self, violation_data: ViolationUpdate) -> ViolationRead:
         violation = self.violation_repo.get_by_id(violation_data.id)
         if violation is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Нарушение не найдено")
 
         violation_res = self.violation_repo.update(
             violation_id=violation_data.id,

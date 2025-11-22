@@ -14,6 +14,13 @@ class ClientRepository:
     def get_by_id(self, client_id: int) -> Optional[ClientEntity]:
         return self.session.get(ClientEntity, client_id)
 
+    def get_by_user_id(self, user_id: int) -> Optional[ClientEntity]:
+        return (
+            self.session.query(ClientEntity)
+            .filter(ClientEntity.user_id == user_id)
+            .first()
+        )
+
     def get_all(self) -> List[ClientEntity]:
         return list(
             self.session.scalars(

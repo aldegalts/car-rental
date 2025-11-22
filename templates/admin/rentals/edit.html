@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование аренды - Панель администратора{% endblock %}
+
+{% block content %}
+<h2>Редактирование аренды #{{ rental.id }}</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" action="/admin/rentals/{{ rental.id }}/edit">
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label">Клиент *</label>
+                        <select class="form-select" id="client_id" name="client_id" required>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}" {% if rental.client_id == client.id %}selected{% endif %}>
+                                {{ client.name }} {{ client.surname }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="car_id" class="form-label">Машина *</label>
+                        <select class="form-select" id="car_id" name="car_id" required>
+                            {% for car in cars %}
+                            <option value="{{ car.id }}" {% if rental.car_id == car.id %}selected{% endif %}>
+                                {{ car.brand }} {{ car.model }} ({{ car.license_plate }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Дата начала *</label>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ rental.start_date }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">Дата окончания *</label>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ rental.end_date }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="total_amount" class="form-label">Общая сумма *</label>
+                        <input type="number" step="0.01" class="form-control" id="total_amount" name="total_amount" value="{{ rental.total_amount }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rental_status_id" class="form-label">Статус *</label>
+                        <select class="form-select" id="rental_status_id" name="rental_status_id" required>
+                            {% for status in statuses %}
+                            <option value="{{ status.id }}" {% if rental.rental_status_id == status.id %}selected{% endif %}>
+                                {{ status.status }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="/admin/rentals/{{ rental.id }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

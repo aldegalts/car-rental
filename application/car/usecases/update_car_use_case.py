@@ -13,7 +13,7 @@ class UpdateCarUseCase:
     def execute(self, car_data: CarUpdate) -> CarRead:
         car = self.car_repo.get_by_id(car_data.id)
         if car is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Статус не найден")
 
         car_res = self.car_repo.update(
             car_id=car.id,

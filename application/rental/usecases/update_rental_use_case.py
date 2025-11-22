@@ -13,7 +13,7 @@ class UpdateRentalUseCase:
     def execute(self, rental_data: RentalUpdate) -> RentalRead:
         rental = self.rental_repo.get_by_id(rental_data.id)
         if rental is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Status not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Аренда не найдена")
 
         rental_res = self.rental_repo.update(
             rental_id=rental.id,

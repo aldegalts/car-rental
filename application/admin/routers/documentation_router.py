@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
 
 from application.dependencies import get_current_user
 from infrastructure.database.models import UserEntity
-from main import app
 
 router = APIRouter(tags=["Documentation"])
 
@@ -26,6 +25,7 @@ def get_admin_docs(
 
 @router.get("/openapi.json", include_in_schema=False)
 def get_open_api(
+        request: Request,
         current_user: UserEntity = Depends(get_current_user)
 ):
     if current_user.role.role_name != "admin":
@@ -33,4 +33,4 @@ def get_open_api(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Forbidden"
         )
-    return JSONResponse(app.openapi())
+    return JSONResponse(request.app.openapi())

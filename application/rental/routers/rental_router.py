@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from application.dependencies import get_current_user
+from application.client.usecases.get_client_by_user_id_use_case import GetClientByUserIdUseCase
 from application.rental.schemas import RentalRead, RentalCreate, RentalUpdate, RentalFilter
 from application.rental.usecases import CreateRentalUseCase, DeleteRentalUseCase, GetAllUserRentalsUseCase, \
     UpdateRentalUseCase, GetUserRentalByIdUseCase, GetAllRentalsUseCase, GetRentalByIdUseCase
@@ -15,13 +16,18 @@ router = APIRouter(prefix="/rentals", tags=["Rentals"])
 
 @router.get("/", response_model=List[RentalRead])
 def get_all_rentals(
-        filters: RentalFilter,
+        car_id: Optional[int] = None,
+        client_id: Optional[int] = None,
         current_user: UserEntity = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can view all rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только админ может просматривать все аренды")
 
+    filters = RentalFilter(
+        car_id=car_id,
+        client_id=client_id
+    )
     return GetAllRentalsUseCase(db).execute(filters)
 
 
@@ -51,8 +57,16 @@ def add_rental(
     current_user: UserEntity = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not current_user.client:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only authorized user with client data can rental cars")
+    try:
+        GetClientByUserIdUseCase(db).execute(current_user.id)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_404_NOT_FOUND:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Только авторизованный пользователь может арендовать авто")
+        raise
+
+    if current_user.role.role_name != "user":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только пользователь с заполненными данными о себе может арендовать авто")
 
     return CreateRentalUseCase(db).execute(rental_data)
 
@@ -64,7 +78,7 @@ def delete_rental(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can delete rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может удалить аренду")
 
     DeleteRentalUseCase(db).execute(rental_id)
     return {"detail": "Rental deleted successfully"}
@@ -77,6 +91,6 @@ def update_rental(
     db: Session = Depends(get_db)
 ):
     if current_user.role.role_name != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admin can update rentals")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может изменить аренду")
 
     return UpdateRentalUseCase(db).execute(rental_data)

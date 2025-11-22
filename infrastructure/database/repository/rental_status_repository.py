@@ -10,6 +10,13 @@ class RentalStatusRepository:
     def __init__(self, session: Session):
         self.session = session
 
+    def get_by_status(self, status: str) -> Optional[RentalStatusEntity]:
+        return (
+            self.session.query(RentalStatusEntity)
+            .filter(RentalStatusEntity.status == status)
+            .first()
+        )
+
     def get_by_id(self, status_id: int) -> Optional[RentalStatusEntity]:
         return self.session.get(RentalStatusEntity, status_id)
 

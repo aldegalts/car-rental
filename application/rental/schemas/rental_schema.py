@@ -15,7 +15,7 @@ class RentalBase(BaseModel):
 
 
 class RentalCreate(RentalBase):
-    pass
+    rental_status_id: Optional[int] = None
 
 
 class RentalUpdate(RentalBase):
