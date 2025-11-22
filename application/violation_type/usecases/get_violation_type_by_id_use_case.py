@@ -18,3 +18,5 @@ class GetViolationTypeByIdUseCase:
         return ViolationTypeRead.model_validate(violation_type)
 
 
+
+
